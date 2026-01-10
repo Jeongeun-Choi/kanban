@@ -36,3 +36,36 @@ export const CreateCardButtons = styled.div`
   display: flex;
   gap: 0.5rem;
 `;
+
+export const DetailContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+export const DetailSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const DetailLabel = styled.div`
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--text-sub, #586069);
+`;
+
+export const DetailTitle = styled.div`
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-main, #24292e);
+  word-break: break-word;
+`;
+
+export const DetailText = styled.div`
+  font-size: 0.9375rem;
+  color: var(--text-main, #24292e);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+`;
