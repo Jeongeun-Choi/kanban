@@ -1,22 +1,48 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+
 import * as Styled from "../styles/styled";
 import AdditionCardButton from "./AdditionCardButton";
 import Card from "../../card/components/Card";
 import type { Card as CardType } from "../../../shared/types/kanban";
+import { FaRegEdit, FaTrash } from "react-icons/fa";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateColumn } from "../api/patchColumn";
 
 interface ColumnProps {
+  id: string;
   title: string;
 }
 
-export default function Column({ title }: ColumnProps) {
+export default function Column({ id, title }: ColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
   const MOCK_CARDS: CardType[] = [];
+
+  const updateMutation = useMutation({
+    mutationFn: (newTitle: string) => updateColumn(id, { title: newTitle }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["columns"] });
+      setIsEditing(false);
+    },
+  });
 
   const handleSubmitTitle = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (titleRef.current?.value && titleRef.current.value !== title) {
+      updateMutation.mutate(titleRef.current.value.trim());
+    } else {
+      setIsEditing(false);
+    }
+  };
 
-    setIsEditing(false);
+  const handleBlur = () => {
+    if (titleRef.current?.value && titleRef.current.value !== title) {
+      updateMutation.mutate(titleRef.current.value.trim());
+    } else {
+      setIsEditing(false);
+    }
   };
 
   useEffect(() => {
@@ -30,13 +56,17 @@ export default function Column({ title }: ColumnProps) {
       <Styled.ColumnHeader>
         <Styled.TitleForm onSubmit={handleSubmitTitle}>
           {isEditing ? (
-            <Styled.Title ref={titleRef} defaultValue={title} />
+            <Styled.Title ref={titleRef} defaultValue={title} onBlur={handleBlur} />
           ) : (
             <span onClick={() => setIsEditing(true)}>{title}</span>
           )}
         </Styled.TitleForm>
-        {/* hover시 삭제 버튼 보여짐 */}
-        {/* <button>삭제 버튼</button> */}
+        <button onClick={() => setIsEditing(true)}>
+          <FaRegEdit />
+        </button>
+        <button>
+          <FaTrash />
+        </button>
       </Styled.ColumnHeader>
       <Styled.ColumnContent>
         {MOCK_CARDS.map((card) => (

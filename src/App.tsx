@@ -26,7 +26,7 @@ function App() {
   return (
     <BoardContainer>
       {columns?.map((column) => (
-        <Column key={column.id} title={column.title} />
+        <Column key={column.id} id={column.id} title={column.title} />
       ))}
       <CreateColumnForm open={open} onClose={() => setOpen(false)} />
       <AdditionColumnButton emptyColumn={columns?.length === 0} onClick={() => setOpen(true)} />

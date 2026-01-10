@@ -21,6 +21,8 @@ export const ColumnHeader = styled.div`
 
 export const TitleForm = styled.form`
   width: 100%;
+  display: flex;
+  flex: 1;
 `;
 
 export const Title = styled.input`
