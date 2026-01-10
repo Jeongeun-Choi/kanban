@@ -55,17 +55,48 @@ export const DetailLabel = styled.div`
   color: var(--text-sub, #586069);
 `;
 
-export const DetailTitle = styled.div`
+export const DetailTitle = styled.span`
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-main, #24292e);
   word-break: break-word;
 `;
 
-export const DetailText = styled.div`
+export const DetailText = styled.span`
   font-size: 0.9375rem;
   color: var(--text-main, #24292e);
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
+`;
+
+export const DetailHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+export const EditForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
+
+export const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const EditLabel = styled.label`
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--text-sub, #586069);
+`;
+
+export const EditButtons = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
 `;

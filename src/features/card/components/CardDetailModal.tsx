@@ -1,6 +1,9 @@
+import { useState } from "react";
+
 import Modal from "../../../shared/components/Modal";
-import * as Styled from "../styles/styled";
 import type { Card } from "../../../shared/types/kanban";
+import CardEditContent from "./CardEditContent";
+import CardDetailContent from "./CardDetailContent";
 
 interface CardDetailModalProps {
   card: Card;
@@ -9,29 +12,28 @@ interface CardDetailModalProps {
 }
 
 export default function CardDetailModal({ card, open, onClose }: CardDetailModalProps) {
+  const [isEdit, setIsEdit] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+
+  const handleChangeEdit = () => {
+    setIsEdit((prev) => !prev);
+  };
+
+  const handleClose = () => {
+    if (isEdit && isDirty) {
+      const isCancel = confirm("변경사항이 있습니다. 정말로 취소하시겠습니까?");
+      if (!isCancel) return;
+    }
+    onClose();
+  };
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <Styled.DetailContainer>
-        <Styled.DetailSection>
-          <Styled.DetailTitle>{card.title}</Styled.DetailTitle>
-        </Styled.DetailSection>
-        <Styled.DetailSection>
-          <Styled.DetailLabel>설명</Styled.DetailLabel>
-          <Styled.DetailText>{card.description}</Styled.DetailText>
-        </Styled.DetailSection>
-        <Styled.DetailSection>
-          <Styled.DetailLabel>마감일</Styled.DetailLabel>
-          <Styled.DetailText>{card.due_date || "-"}</Styled.DetailText>
-        </Styled.DetailSection>
-        <Styled.DetailSection>
-          <Styled.DetailLabel>생성일</Styled.DetailLabel>
-          <Styled.DetailText>{card.created_at || "-"}</Styled.DetailText>
-        </Styled.DetailSection>
-        <Styled.DetailSection>
-          <Styled.DetailLabel>수정일</Styled.DetailLabel>
-          <Styled.DetailText>{card.updated_at || "-"}</Styled.DetailText>
-        </Styled.DetailSection>
-      </Styled.DetailContainer>
+    <Modal open={open} onClose={handleClose}>
+      {isEdit ? (
+        <CardEditContent card={card} onEdit={handleChangeEdit} setIsDirty={setIsDirty} />
+      ) : (
+        <CardDetailContent card={card} onEdit={handleChangeEdit} />
+      )}
     </Modal>
   );
 }
