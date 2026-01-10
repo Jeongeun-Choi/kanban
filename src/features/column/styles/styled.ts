@@ -25,6 +25,7 @@ export const TitleForm = styled.form`
 
 export const Title = styled.input`
   width: 100%;
+  height: 40px;
   border: none;
   font-size: 1rem;
   background-color: transparent;
@@ -54,5 +55,29 @@ export const AdditionColumnButton = styled.button`
   padding: 0.5rem;
   background-color: #cacacaff;
   border: none;
+  border-radius: 4px;
+`;
+
+export const CreateColumnForm = styled.form`
+  width: 240px;
+  height: 100px;
+  padding: 0.5rem;
+  background-color: #cacacaff;
+  border: none;
+  border-radius: 4px;
+  gap: 0.5rem;
+`;
+
+export const CreateColumnButtons = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.3rem;
+`;
+
+export const CreateColumnButton = styled.button<{ variant?: "contained" | "outlined" }>`
+  background-color: ${(props) => (props.variant === "contained" ? "#21728dff" : "white")};
+  border: ${(props) => (props.variant === "contained" ? "none" : "1px solid #191919")};
+  color: ${(props) => (props.variant === "contained" ? "white" : "#191919")};
+  padding: 0.5rem;
   border-radius: 4px;
 `;

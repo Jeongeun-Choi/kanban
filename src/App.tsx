@@ -3,6 +3,8 @@ import { getColumns } from "./features/column/api/getColumns";
 import Column from "./features/column/components/Column";
 import styled from "@emotion/styled";
 import AdditionColumnButton from "./features/column/components/AdditionColumnButton";
+import CreateColumnForm from "./features/column/components/CreateColumnForm";
+import { useState } from "react";
 
 const BoardContainer = styled.div`
   width: 100%;
@@ -14,6 +16,7 @@ const BoardContainer = styled.div`
 `;
 
 function App() {
+  const [open, setOpen] = useState(false);
   const { data: columns } = useQuery({
     queryKey: ["columns"],
     queryFn: () => getColumns(),
@@ -25,7 +28,8 @@ function App() {
       {columns?.map((column) => (
         <Column key={column.id} title={column.title} />
       ))}
-      <AdditionColumnButton emptyColumn={columns?.length === 0} />
+      <CreateColumnForm open={open} onClose={() => setOpen(false)} />
+      <AdditionColumnButton emptyColumn={columns?.length === 0} onClick={() => setOpen(true)} />
     </BoardContainer>
   );
 }

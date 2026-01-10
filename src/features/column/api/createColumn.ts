@@ -2,7 +2,7 @@ import { httpClient } from "../../../shared/api/httpClient";
 import type { Column } from "../../../shared/types/kanban";
 
 interface RequestCreateColumn {
-  title: string;
+  title?: string;
 }
 
 export const createColumn = async (body: RequestCreateColumn) => {
