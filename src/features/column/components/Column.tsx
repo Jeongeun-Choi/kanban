@@ -6,10 +6,11 @@ import Card from "../../card/components/Card";
 import type { Card as CardType } from "../../../shared/types/kanban";
 import { FaRegEdit, FaTrash } from "react-icons/fa";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { updateColumn } from "../api/patchColumn";
 import Modal from "../../../shared/components/Modal";
 import { deleteColumn } from "../api/deleteColumn";
+import { getCards } from "../../card/api/getCards";
 
 interface ColumnProps {
   id: string;
@@ -21,7 +22,12 @@ export default function Column({ id, title }: ColumnProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
-  const MOCK_CARDS: CardType[] = [];
+  const { data: cards } = useQuery<CardType[]>({
+    enabled: !!id,
+    queryKey: ["cards", id],
+    queryFn: () => getCards(id),
+    staleTime: 60 * 60 * 1000,
+  });
 
   const updateMutation = useMutation({
     mutationFn: (newTitle: string) => updateColumn(id, { title: newTitle }),
@@ -80,10 +86,10 @@ export default function Column({ id, title }: ColumnProps) {
           </button>
         </Styled.ColumnHeader>
         <Styled.ColumnContent>
-          {MOCK_CARDS.map((card) => (
+          {cards?.map((card) => (
             <Card key={card.id} {...card} />
           ))}
-          <AdditionCardButton emptyColumn={MOCK_CARDS.length === 0} onClick={() => {}} />
+          <AdditionCardButton emptyColumn={cards?.length === 0} onClick={() => {}} />
         </Styled.ColumnContent>
       </Styled.ColumnContainer>
       <Modal
