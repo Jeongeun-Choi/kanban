@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getColumns } from "./features/column/api/getColumns";
 import Column from "./features/column/components/Column";
 import styled from "@emotion/styled";
+import AdditionColumnButton from "./features/column/components/AdditionColumnButton";
 
 const BoardContainer = styled.div`
   width: 100%;
@@ -9,6 +10,7 @@ const BoardContainer = styled.div`
   gap: 1rem;
   height: 100vh;
   padding: 40px;
+  overflow-x: scroll;
 `;
 
 function App() {
@@ -23,6 +25,7 @@ function App() {
       {columns?.map((column) => (
         <Column key={column.id} title={column.title} />
       ))}
+      <AdditionColumnButton emptyColumn={columns?.length === 0} />
     </BoardContainer>
   );
 }

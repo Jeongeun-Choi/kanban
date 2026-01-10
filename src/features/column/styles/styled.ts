@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 
 export const ColumnContainer = styled.div`
   width: 240px;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -15,7 +16,7 @@ export const ColumnHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   color: var(--text-main);
-  font-weight: 600;
+  font-weight: 700;
 `;
 
 export const TitleForm = styled.form`
@@ -26,7 +27,6 @@ export const Title = styled.input`
   width: 100%;
   border: none;
   font-size: 1rem;
-  font-weight: 600;
   background-color: transparent;
   color: var(--text-main);
 `;
@@ -41,6 +41,15 @@ export const ColumnContent = styled.ul`
 
 export const AdditionCardButtonContainer = styled.button`
   width: 100%;
+  height: 50px;
+  padding: 0.5rem;
+  background-color: #cacacaff;
+  border: none;
+  border-radius: 4px;
+`;
+
+export const AdditionColumnButton = styled.button`
+  width: 240px;
   height: 50px;
   padding: 0.5rem;
   background-color: #cacacaff;
