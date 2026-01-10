@@ -10,18 +10,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateColumn } from "../api/patchColumn";
 import Modal from "../../../shared/components/Modal";
 import { deleteColumn } from "../api/deleteColumn";
-
+import CreateCardForm from "../../card/components/CreateCardForm";
 interface ColumnProps {
   id: string;
   title: string;
+  cards: CardType[];
 }
 
-export default function Column({ id, title }: ColumnProps) {
+export default function Column({ id, title, cards }: ColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [createCardOpen, setCreateCardOpen] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
-  const MOCK_CARDS: CardType[] = [];
 
   const updateMutation = useMutation({
     mutationFn: (newTitle: string) => updateColumn(id, { title: newTitle }),
@@ -80,10 +81,18 @@ export default function Column({ id, title }: ColumnProps) {
           </button>
         </Styled.ColumnHeader>
         <Styled.ColumnContent>
-          {MOCK_CARDS.map((card) => (
+          {cards?.map((card) => (
             <Card key={card.id} {...card} />
           ))}
-          <AdditionCardButton emptyColumn={MOCK_CARDS.length === 0} onClick={() => {}} />
+          <CreateCardForm
+            open={createCardOpen}
+            columnId={id}
+            onClose={() => setCreateCardOpen(false)}
+          />
+          <AdditionCardButton
+            emptyColumn={cards?.length === 0}
+            onClick={() => setCreateCardOpen(true)}
+          />
         </Styled.ColumnContent>
       </Styled.ColumnContainer>
       <Modal

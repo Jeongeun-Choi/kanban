@@ -4,8 +4,8 @@ import type { Card } from "../../../shared/types/kanban";
 interface RequestCreateCard {
   column_id: string;
   title: string;
-  description: string;
-  due_date: string | null;
+  description?: string;
+  due_date?: string;
 }
 
 export const createCard = async (body: RequestCreateCard) => {
