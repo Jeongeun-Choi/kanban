@@ -2,6 +2,8 @@ import * as Styled from "../styles/styled";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createColumn } from "../api/createColumn";
 import { useRef, type FormEvent } from "react";
+import Button from "../../../shared/components/Button";
+import Input from "../../../shared/components/Input";
 
 interface CreateColumnFormProps {
   open: boolean;
@@ -42,14 +44,14 @@ export default function CreateColumnForm({ open, onClose }: CreateColumnFormProp
 
   return (
     <Styled.CreateColumnForm onSubmit={handleSubmit}>
-      <Styled.Title ref={titleRef} placeholder="Column title" />
+      <Input ref={titleRef} placeholder="Column title" fullWidth />
       <Styled.CreateColumnButtons>
-        <Styled.CreateColumnButton type="submit" variant="contained">
+        <Button type="submit" variant="contained">
           Add
-        </Styled.CreateColumnButton>
-        <Styled.CreateColumnButton type="button" variant="outlined" onClick={onClose}>
+        </Button>
+        <Button type="button" variant="outlined" onClick={onClose}>
           Cancel
-        </Styled.CreateColumnButton>
+        </Button>
       </Styled.CreateColumnButtons>
     </Styled.CreateColumnForm>
   );

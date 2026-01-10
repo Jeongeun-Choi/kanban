@@ -2,6 +2,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import * as Styled from "../styles/styled";
 import { useRef, type FormEvent } from "react";
 import { createCard } from "../api/createCard";
+import Button from "../../../shared/components/Button";
+import Input from "../../../shared/components/Input";
+import Textarea from "../../../shared/components/Textarea";
 
 interface CreateCardFormProps {
   open: boolean;
@@ -47,10 +50,17 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
 
   return (
     <Styled.CreateCardForm onSubmit={handleSubmit}>
-      <input ref={titleRef} type="text" placeholder="Card title" />
-      <textarea ref={descriptionRef} placeholder="Description" />
-      <input ref={dueDateRef} type="date" />
-      <button type="submit">Add</button>
+      <Input ref={titleRef} placeholder="Card title" fullWidth />
+      <Textarea ref={descriptionRef} placeholder="Description" fullWidth />
+      <Input ref={dueDateRef} type="date" fullWidth />
+      <Styled.CreateCardButtons>
+        <Button type="submit" variant="contained">
+          Add
+        </Button>
+        <Button type="button" variant="outlined" onClick={onClose}>
+          Cancel
+        </Button>
+      </Styled.CreateCardButtons>
     </Styled.CreateCardForm>
   );
 }
