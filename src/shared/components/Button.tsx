@@ -31,16 +31,13 @@ const StyledButton = styled.button<ButtonProps>`
         `;
       case "outlined":
         return `
-          background-color: transparent;
+          background-color: white;
           color: var(--text-main, #24292E);
           border: 1px solid var(--border-color, #E1E4E8);
-          &:hover {
-            background-color: rgba(0, 0, 0, 0.04);
-          }
         `;
       case "text":
         return `
-          background-color: transparent;
+          background-color: white;
           color: var(--text-sub, #586069);
           border: none;
           &:hover {
