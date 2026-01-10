@@ -3,6 +3,7 @@ export interface Column {
   title: string;
   order: number;
   created_at: string;
+  cards: Card[];
 }
 
 export interface Card {

@@ -6,28 +6,23 @@ import Card from "../../card/components/Card";
 import type { Card as CardType } from "../../../shared/types/kanban";
 import { FaRegEdit, FaTrash } from "react-icons/fa";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateColumn } from "../api/patchColumn";
 import Modal from "../../../shared/components/Modal";
 import { deleteColumn } from "../api/deleteColumn";
-import { getCards } from "../../card/api/getCards";
-
+import CreateCardForm from "../../card/components/CreateCardForm";
 interface ColumnProps {
   id: string;
   title: string;
+  cards: CardType[];
 }
 
-export default function Column({ id, title }: ColumnProps) {
+export default function Column({ id, title, cards }: ColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [createCardOpen, setCreateCardOpen] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
-  const { data: cards } = useQuery<CardType[]>({
-    enabled: !!id,
-    queryKey: ["cards", id],
-    queryFn: () => getCards(id),
-    staleTime: 60 * 60 * 1000,
-  });
 
   const updateMutation = useMutation({
     mutationFn: (newTitle: string) => updateColumn(id, { title: newTitle }),
@@ -89,7 +84,15 @@ export default function Column({ id, title }: ColumnProps) {
           {cards?.map((card) => (
             <Card key={card.id} {...card} />
           ))}
-          <AdditionCardButton emptyColumn={cards?.length === 0} onClick={() => {}} />
+          <CreateCardForm
+            open={createCardOpen}
+            columnId={id}
+            onClose={() => setCreateCardOpen(false)}
+          />
+          <AdditionCardButton
+            emptyColumn={cards?.length === 0}
+            onClick={() => setCreateCardOpen(true)}
+          />
         </Styled.ColumnContent>
       </Styled.ColumnContainer>
       <Modal
