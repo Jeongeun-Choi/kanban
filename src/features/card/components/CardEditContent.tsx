@@ -8,6 +8,7 @@ import Textarea from "../../../shared/components/Textarea";
 import useInput from "../../../shared/hooks/useInput";
 import type { Card, Column } from "../../../shared/types/kanban";
 import { updateCard } from "../api/patchCard";
+
 import * as Styled from "../styles/styled";
 
 interface CardEditContentProps {

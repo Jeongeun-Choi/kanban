@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import Button from "../../../shared/components/Button";
 
 export const CardContainer = styled.li`
   width: 100%;
@@ -96,7 +97,18 @@ export const EditLabel = styled.label`
 
 export const EditButtons = styled.div`
   display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-top: 1rem;
+  width: 100%;
+`;
+
+export const DangerButton = styled(Button)`
+  background-color: #d73a49;
+  border-color: #d73a49;
+  color: white;
+  &:hover {
+    background-color: #b31d28;
+    border-color: #b31d28;
+    opacity: 1;
+  }
 `;
