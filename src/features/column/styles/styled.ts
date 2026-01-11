@@ -39,9 +39,18 @@ export const Title = styled.input`
 export const ColumnContent = styled.ul`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: stretch;
   gap: 0.5rem;
+  width: 100%;
+`;
+
+export const DropIndicator = styled.li`
+  height: 4px;
+  background-color: var(--accent-main, #3b82f6);
+  border-radius: 2px;
+  margin: 4px 0;
+  list-style: none;
 `;
 
 export const AdditionCardButtonContainer = styled.button`

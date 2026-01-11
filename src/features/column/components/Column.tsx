@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent, type DragEvent } from "react";
+import { useEffect, useRef, useState, Fragment, type FormEvent, type DragEvent } from "react";
 
 import * as Styled from "../styles/styled";
 import AdditionCardButton from "./AdditionCardButton";
@@ -30,6 +30,7 @@ interface ColumnProps {
   ) => void;
   onCardDragEnd?: (event: DragEvent<HTMLElement>) => void;
   draggedCard?: CardType | null;
+  dropIndicator?: { columnId: string; index: number } | null;
 }
 
 export default function Column({
@@ -46,6 +47,7 @@ export default function Column({
   onCardDragOver,
   onCardDragEnd,
   draggedCard,
+  dropIndicator,
 }: ColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -127,16 +129,24 @@ export default function Column({
           </button>
         </Styled.ColumnHeader>
         <Styled.ColumnContent>
-          {cards?.map((card) => (
-            <Card
-              key={card.id}
-              {...card}
-              draggable
-              onCardDragStart={onCardDragStart}
-              onCardDragEnd={onCardDragEnd}
-              isDragging={draggedCard?.id === card.id}
-            />
+          {cards?.map((card, index) => (
+            <Fragment key={card.id}>
+              {dropIndicator?.columnId === id && dropIndicator.index === index && (
+                <Styled.DropIndicator />
+              )}
+              <Card
+                {...card}
+                draggable
+                onCardDragStart={onCardDragStart}
+                onCardDragEnd={onCardDragEnd}
+                isDragging={draggedCard?.id === card.id}
+              />
+            </Fragment>
           ))}
+          {dropIndicator?.columnId === id &&
+            (dropIndicator.index === cards?.length || cards?.length === 0) && (
+              <Styled.DropIndicator />
+            )}
           <CreateCardForm
             open={createCardOpen}
             columnId={id}

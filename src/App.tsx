@@ -26,11 +26,12 @@ function App() {
 
   const {
     draggedCard,
+    dropIndicator,
     handleCardDragStart,
     handleCardDragOver,
     handleCardDragEnd,
     handleCardDrop,
-  } = useCardDrag({ localColumns, setLocalColumns });
+  } = useCardDrag({ localColumns });
 
   const { data: columns } = useQuery({
     queryKey: ["columns"],
@@ -82,7 +83,7 @@ function App() {
   }, [columns]);
 
   return (
-    <BoardContainer>
+    <BoardContainer onDragOver={(e) => e.preventDefault()} onDrop={(e) => handleCardDragEnd(e)}>
       {localColumns.map((column) => (
         <Column
           key={column.id}
@@ -97,8 +98,9 @@ function App() {
           onCardDragStart={handleCardDragStart}
           onCardDragOver={handleCardDragOver}
           onCardDragEnd={handleCardDragEnd}
-          onDrop={(e) => handleCardDrop(e, column.id)}
+          onDrop={handleCardDrop}
           draggedCard={draggedCard}
+          dropIndicator={dropIndicator}
         />
       ))}
       <CreateColumnForm open={open} onClose={() => setOpen(false)} />
