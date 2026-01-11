@@ -132,8 +132,8 @@ export default function Column({
               key={card.id}
               {...card}
               draggable
-              onDragStart={(e) => onCardDragStart?.(e as DragEvent<HTMLElement>, card)}
-              onDragEnd={(e) => onCardDragEnd?.(e as DragEvent<HTMLElement>)}
+              onCardDragStart={onCardDragStart}
+              onCardDragEnd={onCardDragEnd}
               isDragging={draggedCard?.id === card.id}
             />
           ))}

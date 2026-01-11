@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, type DragEvent } from "react";
+import { useState, memo, useCallback, type DragEvent } from "react";
 import { FaTrash } from "react-icons/fa";
 import * as Styled from "../styles/styled";
 import { deleteCard } from "../api/deleteCard";
@@ -15,12 +15,12 @@ interface Card {
   created_at: string;
   updated_at: string;
   draggable?: boolean;
-  onDragStart?: (event: DragEvent<HTMLLIElement>) => void;
-  onDragEnd?: (event: DragEvent<HTMLLIElement>) => void;
+  onCardDragStart?: (event: DragEvent<HTMLElement>, card: Card) => void;
+  onCardDragEnd?: (event: DragEvent<HTMLElement>) => void;
   isDragging?: boolean;
 }
 
-export default function Card({
+const Card = memo(function Card({
   id,
   title,
   column_id,
@@ -30,8 +30,8 @@ export default function Card({
   created_at,
   updated_at,
   draggable,
-  onDragStart,
-  onDragEnd,
+  onCardDragStart,
+  onCardDragEnd,
   isDragging,
 }: Card) {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -56,13 +56,36 @@ export default function Card({
     }
   };
 
+  const handleDragStart = useCallback(
+    (e: DragEvent<HTMLLIElement>) => {
+      onCardDragStart?.(e, {
+        id,
+        title,
+        column_id,
+        description,
+        due_date,
+        order,
+        created_at,
+        updated_at,
+      });
+    },
+    [onCardDragStart, id, title, column_id, description, due_date, order, created_at, updated_at]
+  );
+
+  const handleDragEnd = useCallback(
+    (e: DragEvent<HTMLLIElement>) => {
+      onCardDragEnd?.(e);
+    },
+    [onCardDragEnd]
+  );
+
   return (
     <>
       <Styled.CardContainer
         onClick={() => setIsDetailOpen(true)}
         draggable={draggable}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
         isDragging={isDragging}
         data-card-id={id}
       >
@@ -90,4 +113,6 @@ export default function Card({
       />
     </>
   );
-}
+});
+
+export default Card;
