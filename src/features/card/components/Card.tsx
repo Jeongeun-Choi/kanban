@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, memo, useCallback, type DragEvent } from "react";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaExclamationCircle } from "react-icons/fa";
 import * as Styled from "../styles/styled";
 import { deleteCard } from "../api/deleteCard";
 import CardDetailModal from "./CardDetailModal";
 import IconButton from "../../../shared/components/IconButton";
+import { isOverdue as checkOverdue } from "../../../shared/utils/date";
 
 interface Card {
   id: string;
@@ -88,6 +89,8 @@ const Card = memo(function Card({
     [onCardDragOver, column_id, id]
   );
 
+  const isOverdue = checkOverdue(due_date);
+
   return (
     <>
       <Styled.CardContainer
@@ -97,6 +100,7 @@ const Card = memo(function Card({
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
         isDragging={isDragging}
+        isOverdue={isOverdue}
         data-card-id={id}
       >
         <Styled.CardTitle>
@@ -105,7 +109,12 @@ const Card = memo(function Card({
             <FaTrash />
           </IconButton>
         </Styled.CardTitle>
-        <Styled.CardDeadline>{due_date}</Styled.CardDeadline>
+        {due_date && (
+          <Styled.CardDeadline isOverdue={isOverdue}>
+            {isOverdue && <FaExclamationCircle />}
+            {due_date}
+          </Styled.CardDeadline>
+        )}
       </Styled.CardContainer>
       <CardDetailModal
         card={{
