@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FaRegEdit } from "react-icons/fa";
+import { FaRegEdit, FaExclamationCircle } from "react-icons/fa";
 import * as Styled from "../styles/styled";
 import type { Card } from "../../../shared/types/kanban";
 import { deleteCard } from "../api/deleteCard";
 import IconButton from "../../../shared/components/IconButton";
+import { isOverdue as checkOverdue } from "../../../shared/utils/date";
 
 interface CardDetailContentProps {
   card: Card;
@@ -12,6 +13,7 @@ interface CardDetailContentProps {
 
 export default function CardDetailContent({ card, onEdit }: CardDetailContentProps) {
   const queryClient = useQueryClient();
+  const isOverdue = checkOverdue(card.due_date);
 
   const deleteMutation = useMutation({
     mutationFn: (cardId: string) => deleteCard(cardId),
@@ -44,7 +46,14 @@ export default function CardDetailContent({ card, onEdit }: CardDetailContentPro
       </Styled.DetailSection>
       <Styled.DetailSection>
         <Styled.DetailLabel>마감일</Styled.DetailLabel>
-        <Styled.DetailText>{card.due_date || "-"}</Styled.DetailText>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          {isOverdue && (
+            <Styled.OverdueIconWrapper>
+              <FaExclamationCircle size={18} />
+            </Styled.OverdueIconWrapper>
+          )}
+          <Styled.DetailText isOverdue={isOverdue}>{card.due_date || "-"}</Styled.DetailText>
+        </div>
       </Styled.DetailSection>
       <Styled.DetailSection>
         <Styled.DetailLabel>생성일</Styled.DetailLabel>

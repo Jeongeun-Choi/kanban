@@ -1,13 +1,14 @@
 import styled from "@emotion/styled";
 import Button from "../../../shared/components/Button";
 
-export const CardContainer = styled.li<{ isDragging?: boolean }>`
+export const CardContainer = styled.li<{ isDragging?: boolean; isOverdue?: boolean }>`
   width: 100%;
   border-radius: 4px;
   padding: 1rem;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
+  border: ${({ isOverdue }) => (isOverdue ? "2px solid #d73a49" : "none")};
 `;
 
 export const CardTitle = styled.div`
@@ -17,9 +18,19 @@ export const CardTitle = styled.div`
   font-weight: bold;
 `;
 
-export const CardDeadline = styled.div`
+export const CardDeadline = styled.div<{ isOverdue?: boolean }>`
   font-size: 0.75rem;
-  color: #666;
+  color: ${({ isOverdue }) => (isOverdue ? "#d73a49" : "#666")};
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+`;
+
+export const OverdueIconWrapper = styled.span`
+  color: #d73a49;
+  display: flex;
+  align-items: center;
 `;
 
 export const CreateCardForm = styled.form`
@@ -64,9 +75,9 @@ export const DetailTitle = styled.span`
   word-break: break-word;
 `;
 
-export const DetailText = styled.span`
+export const DetailText = styled.span<{ isOverdue?: boolean }>`
   font-size: 0.9375rem;
-  color: var(--text-main, #24292e);
+  color: ${({ isOverdue }) => (isOverdue ? "#d73a49" : "var(--text-main, #24292e)")};
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
