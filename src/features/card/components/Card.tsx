@@ -4,6 +4,7 @@ import { FaTrash } from "react-icons/fa";
 import * as Styled from "../styles/styled";
 import { deleteCard } from "../api/deleteCard";
 import CardDetailModal from "./CardDetailModal";
+import IconButton from "../../../shared/components/IconButton";
 
 interface Card {
   id: string;
@@ -100,9 +101,9 @@ const Card = memo(function Card({
       >
         <Styled.CardTitle>
           <span>{title}</span>
-          <button onClick={handleDelete}>
+          <IconButton size="small" onClick={handleDelete}>
             <FaTrash />
-          </button>
+          </IconButton>
         </Styled.CardTitle>
         <Styled.CardDeadline>{due_date}</Styled.CardDeadline>
       </Styled.CardContainer>
