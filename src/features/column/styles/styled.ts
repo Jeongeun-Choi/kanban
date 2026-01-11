@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-export const ColumnContainer = styled.div`
+export const ColumnContainer = styled.div<{ isDragging?: boolean }>`
   width: 240px;
   min-height: 240px;
   display: flex;
@@ -9,6 +9,8 @@ export const ColumnContainer = styled.div`
   background-color: var(--bg-column);
   border-radius: 8px;
   padding: 1rem;
+  opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
+  transition: opacity 0.2s ease;
 `;
 
 export const ColumnHeader = styled.div`
