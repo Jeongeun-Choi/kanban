@@ -109,7 +109,7 @@ export default memo(function Column({
             {isEditing ? (
               <Input ref={titleRef} defaultValue={title} onBlur={handleBlur} fullWidth />
             ) : (
-              <span onClick={() => setIsEditing(true)}>{title}</span>
+              <Styled.ColumnTitle onClick={() => setIsEditing(true)}>{title}</Styled.ColumnTitle>
             )}
           </Styled.TitleForm>
           <IconButton size="small" onClick={() => setIsEditing(true)}>

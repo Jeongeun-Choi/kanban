@@ -28,6 +28,23 @@ export const TitleForm = styled.form`
   width: 100%;
   display: flex;
   flex: 1;
+  align-items: center;
+`;
+
+export const ColumnTitle = styled.span`
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent; /* Match Input border width */
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  min-height: 34px; /* Approximate height of Input to be safe */
+  box-sizing: border-box;
 `;
 
 export const ColumnContent = styled.ul`
