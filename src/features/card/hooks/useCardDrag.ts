@@ -78,9 +78,19 @@ export function useCardDrag({ localColumns }: UseCardDragProps) {
       const targetColumn = localColumns.find((col) => col.id === targetColumnId);
       if (!targetColumn) return;
 
-      const targetIndex = targetCardId
+      const hoveredIndex = targetCardId
         ? targetColumn.cards.findIndex((card) => card.id === targetCardId)
-        : targetColumn.cards.length;
+        : -1;
+
+      let targetIndex: number;
+
+      if (hoveredIndex !== -1) {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const isBottomHalf = event.clientY > rect.top + rect.height / 2;
+        targetIndex = isBottomHalf ? hoveredIndex + 1 : hoveredIndex;
+      } else {
+        targetIndex = targetColumn.cards.length;
+      }
 
       setDropIndicator((prev) => {
         if (prev?.columnId === targetColumnId && prev?.index === targetIndex) {

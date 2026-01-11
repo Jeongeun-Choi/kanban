@@ -53,6 +53,13 @@ export const DropIndicator = styled.li`
   list-style: none;
 `;
 
+export const ColumnDropIndicator = styled.div`
+  width: 4px;
+  background-color: var(--accent-main, #3b82f6);
+  border-radius: 2px;
+  margin: 0 2px;
+`;
+
 export const AdditionCardButtonContainer = styled.button`
   width: 100%;
   height: 50px;
