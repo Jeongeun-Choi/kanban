@@ -1,14 +1,39 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, memo, useCallback, type DragEvent } from "react";
 import { FaTrash } from "react-icons/fa";
-import { CardContainer, CardDeadline, CardTitle } from "../styles/styled";
-import type { Card as CardType } from "../../../shared/types/kanban";
+import * as Styled from "../styles/styled";
 import { deleteCard } from "../api/deleteCard";
 import CardDetailModal from "./CardDetailModal";
 
-type CardProps = CardType;
+interface Card {
+  id: string;
+  title: string;
+  column_id: string;
+  description?: string;
+  due_date?: string;
+  order: number;
+  created_at: string;
+  updated_at: string;
+  draggable?: boolean;
+  onCardDragStart?: (event: DragEvent<HTMLElement>, card: Card) => void;
+  onCardDragEnd?: (event: DragEvent<HTMLElement>) => void;
+  isDragging?: boolean;
+}
 
-export default function Card(card: CardProps) {
+const Card = memo(function Card({
+  id,
+  title,
+  column_id,
+  description,
+  due_date,
+  order,
+  created_at,
+  updated_at,
+  draggable,
+  onCardDragStart,
+  onCardDragEnd,
+  isDragging,
+}: Card) {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -27,22 +52,67 @@ export default function Card(card: CardProps) {
     e.stopPropagation();
 
     if (confirm("정말로 삭제하시겠습니까?")) {
-      mutation.mutate(card.id);
+      mutation.mutate(id);
     }
   };
 
+  const handleDragStart = useCallback(
+    (e: DragEvent<HTMLLIElement>) => {
+      onCardDragStart?.(e, {
+        id,
+        title,
+        column_id,
+        description,
+        due_date,
+        order,
+        created_at,
+        updated_at,
+      });
+    },
+    [onCardDragStart, id, title, column_id, description, due_date, order, created_at, updated_at]
+  );
+
+  const handleDragEnd = useCallback(
+    (e: DragEvent<HTMLLIElement>) => {
+      onCardDragEnd?.(e);
+    },
+    [onCardDragEnd]
+  );
+
   return (
     <>
-      <CardContainer onClick={() => setIsDetailOpen(true)}>
-        <CardTitle>
-          <span>{card.title}</span>
+      <Styled.CardContainer
+        onClick={() => setIsDetailOpen(true)}
+        draggable={draggable}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        isDragging={isDragging}
+        data-card-id={id}
+      >
+        <Styled.CardTitle>
+          <span>{title}</span>
           <button onClick={handleDelete}>
             <FaTrash />
           </button>
-        </CardTitle>
-        <CardDeadline>{card.due_date}</CardDeadline>
-      </CardContainer>
-      <CardDetailModal card={card} open={isDetailOpen} onClose={() => setIsDetailOpen(false)} />
+        </Styled.CardTitle>
+        <Styled.CardDeadline>{due_date}</Styled.CardDeadline>
+      </Styled.CardContainer>
+      <CardDetailModal
+        card={{
+          id,
+          title,
+          column_id,
+          description,
+          due_date,
+          order,
+          created_at,
+          updated_at,
+        }}
+        open={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
     </>
   );
-}
+});
+
+export default Card;

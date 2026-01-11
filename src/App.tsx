@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getColumns } from "./features/column/api/getColumns";
 import { updateColumn } from "./features/column/api/patchColumn";
-import type { Column as ColumnType } from "./shared/types/kanban";
+import { type Column as ColumnType } from "./shared/types/kanban";
 import Column from "./features/column/components/Column";
 import styled from "@emotion/styled";
 import AdditionColumnButton from "./features/column/components/AdditionColumnButton";
 import CreateColumnForm from "./features/column/components/CreateColumnForm";
 import { useState, useEffect, type DragEvent } from "react";
+import { useCardDrag } from "./features/card/hooks/useCardDrag";
 
 const BoardContainer = styled.div`
   width: 100%;
@@ -23,17 +24,19 @@ function App() {
   const [localColumns, setLocalColumns] = useState<ColumnType[]>([]);
   const queryClient = useQueryClient();
 
+  const {
+    draggedCard,
+    handleCardDragStart,
+    handleCardDragOver,
+    handleCardDragEnd,
+    handleCardDrop,
+  } = useCardDrag({ localColumns, setLocalColumns });
+
   const { data: columns } = useQuery({
     queryKey: ["columns"],
     queryFn: () => getColumns(),
     staleTime: 60 * 60 * 1000,
   });
-
-  useEffect(() => {
-    if (columns) {
-      setLocalColumns(columns);
-    }
-  }, [columns]);
 
   const updateOrderMutation = useMutation({
     mutationFn: (newColumns: ColumnType[]) => {
@@ -46,11 +49,11 @@ function App() {
     },
   });
 
-  const handleDragStart = (id: string) => {
+  const handleColumnDragStart = (id: string) => {
     setDraggedColumnId(id);
   };
 
-  const handleDragOver = (event: DragEvent<HTMLDivElement>, targetId: string) => {
+  const handleColumnDragOver = (event: DragEvent<HTMLDivElement>, targetId: string) => {
     event.preventDefault();
     if (!draggedColumnId || draggedColumnId === targetId) return;
 
@@ -66,11 +69,17 @@ function App() {
     setLocalColumns(newColumns);
   };
 
-  const handleDragEnd = (event: DragEvent<HTMLDivElement>) => {
+  const handleColumnDragEnd = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setDraggedColumnId(null);
     updateOrderMutation.mutate(localColumns);
   };
+
+  useEffect(() => {
+    if (columns) {
+      setLocalColumns(columns);
+    }
+  }, [columns]);
 
   return (
     <BoardContainer>
@@ -81,10 +90,15 @@ function App() {
           title={column.title}
           cards={column.cards}
           draggable
-          onDragStart={() => handleDragStart(column.id)}
-          onDragOver={(event) => handleDragOver(event, column.id)}
-          onDragEnd={handleDragEnd}
+          onDragStart={() => handleColumnDragStart(column.id)}
+          onDragOver={(event) => handleColumnDragOver(event, column.id)}
+          onDragEnd={handleColumnDragEnd}
           isDragging={draggedColumnId === column.id}
+          onCardDragStart={handleCardDragStart}
+          onCardDragOver={handleCardDragOver}
+          onCardDragEnd={handleCardDragEnd}
+          onDrop={(e) => handleCardDrop(e, column.id)}
+          draggedCard={draggedCard}
         />
       ))}
       <CreateColumnForm open={open} onClose={() => setOpen(false)} />
