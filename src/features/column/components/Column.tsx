@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type DragEvent } from "react";
 
 import * as Styled from "../styles/styled";
 import AdditionCardButton from "./AdditionCardButton";
@@ -11,13 +11,28 @@ import { updateColumn } from "../api/patchColumn";
 import Modal from "../../../shared/components/Modal";
 import { deleteColumn } from "../api/deleteColumn";
 import CreateCardForm from "../../card/components/CreateCardForm";
+
 interface ColumnProps {
   id: string;
   title: string;
   cards: CardType[];
+  draggable?: boolean;
+  onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragOver?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragEnd?: (event: DragEvent<HTMLDivElement>) => void;
+  isDragging?: boolean;
 }
 
-export default function Column({ id, title, cards }: ColumnProps) {
+export default function Column({
+  id,
+  title,
+  cards,
+  draggable,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+  isDragging,
+}: ColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [createCardOpen, setCreateCardOpen] = useState(false);
@@ -64,7 +79,13 @@ export default function Column({ id, title, cards }: ColumnProps) {
 
   return (
     <>
-      <Styled.ColumnContainer>
+      <Styled.ColumnContainer
+        draggable={draggable}
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDragEnd={onDragEnd}
+        isDragging={isDragging}
+      >
         <Styled.ColumnHeader>
           <Styled.TitleForm onSubmit={handleSubmitTitle}>
             {isEditing ? (
