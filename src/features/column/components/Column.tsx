@@ -20,7 +20,16 @@ interface ColumnProps {
   onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
   onDragOver?: (event: DragEvent<HTMLDivElement>) => void;
   onDragEnd?: (event: DragEvent<HTMLDivElement>) => void;
+  onDrop?: (event: DragEvent<HTMLDivElement>) => void;
   isDragging?: boolean;
+  onCardDragStart?: (event: DragEvent<HTMLElement>, card: CardType) => void;
+  onCardDragOver?: (
+    event: DragEvent<HTMLElement>,
+    targetColumnId: string,
+    targetCardId?: string
+  ) => void;
+  onCardDragEnd?: (event: DragEvent<HTMLElement>) => void;
+  draggedCard?: CardType | null;
 }
 
 export default function Column({
@@ -31,7 +40,12 @@ export default function Column({
   onDragStart,
   onDragOver,
   onDragEnd,
+  onDrop,
   isDragging,
+  onCardDragStart,
+  onCardDragOver,
+  onCardDragEnd,
+  draggedCard,
 }: ColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -82,8 +96,19 @@ export default function Column({
       <Styled.ColumnContainer
         draggable={draggable}
         onDragStart={onDragStart}
-        onDragOver={onDragOver}
+        onDragOver={(e) => {
+          if (draggedCard && onCardDragOver) {
+            e.preventDefault();
+            const targetEl = document.elementFromPoint(e.clientX, e.clientY);
+            const cardEl = targetEl?.closest("[data-card-id]");
+            const targetCardId = cardEl?.getAttribute("data-card-id") || undefined;
+            onCardDragOver(e, id, targetCardId);
+          } else if (onDragOver) {
+            onDragOver(e);
+          }
+        }}
         onDragEnd={onDragEnd}
+        onDrop={onDrop}
         isDragging={isDragging}
       >
         <Styled.ColumnHeader>
@@ -103,7 +128,14 @@ export default function Column({
         </Styled.ColumnHeader>
         <Styled.ColumnContent>
           {cards?.map((card) => (
-            <Card key={card.id} {...card} />
+            <Card
+              key={card.id}
+              {...card}
+              draggable
+              onDragStart={(e) => onCardDragStart?.(e as DragEvent<HTMLElement>, card)}
+              onDragEnd={(e) => onCardDragEnd?.(e as DragEvent<HTMLElement>)}
+              isDragging={draggedCard?.id === card.id}
+            />
           ))}
           <CreateCardForm
             open={createCardOpen}
