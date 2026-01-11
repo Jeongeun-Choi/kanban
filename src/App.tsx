@@ -61,14 +61,14 @@ function App() {
             title={column.title}
             cards={column.cards}
             draggable
-            onDragStart={(e) => handleColumnDragStart(e, column.id)}
-            onDragOver={(event) => handleColumnDragOver(event, column.id)}
-            onDragEnd={handleColumnDragEnd}
+            onColumnDragStart={handleColumnDragStart}
+            onColumnDragOver={handleColumnDragOver}
+            onColumnDragEnd={handleColumnDragEnd}
             isDragging={draggedColumnId === column.id}
             onCardDragStart={handleCardDragStart}
             onCardDragOver={handleCardDragOver}
             onCardDragEnd={handleCardDragEnd}
-            onDrop={handleCardDrop}
+            onColumnDrop={handleCardDrop}
             draggedCard={draggedCard}
             dropIndicator={cardDropIndicator}
           />
