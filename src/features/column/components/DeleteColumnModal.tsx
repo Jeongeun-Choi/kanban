@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteColumn } from "../api/deleteColumn";
 import Modal from "../../../shared/components/Modal";
+import Button from "../../../shared/components/Button";
 
 interface DeleteColumnModalProps {
   open: boolean;
@@ -25,14 +26,17 @@ export default function DeleteColumnModal({ open, onClose, columnId }: DeleteCol
       open={open}
       onClose={onClose}
       buttons={[
-        <button
+        <Button
+          variant="contained"
           onClick={() => {
             deleteMutation.mutate();
           }}
         >
           Confirm
-        </button>,
-        <button onClick={onClose}>Cancel</button>,
+        </Button>,
+        <Button variant="outlined" onClick={onClose}>
+          Cancel
+        </Button>,
       ]}
     >
       <span>컬럼 삭제시 컬럼에 있는 카드들도 모두 삭제됩니다.</span>

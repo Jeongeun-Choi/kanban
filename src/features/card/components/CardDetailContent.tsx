@@ -3,6 +3,7 @@ import { FaRegEdit } from "react-icons/fa";
 import * as Styled from "../styles/styled";
 import type { Card } from "../../../shared/types/kanban";
 import { deleteCard } from "../api/deleteCard";
+import IconButton from "../../../shared/components/IconButton";
 
 interface CardDetailContentProps {
   card: Card;
@@ -33,9 +34,9 @@ export default function CardDetailContent({ card, onEdit }: CardDetailContentPro
     <Styled.DetailContainer>
       <Styled.DetailHeader>
         <Styled.DetailTitle>{card.title}</Styled.DetailTitle>
-        <button onClick={onEdit}>
+        <IconButton size="small" onClick={onEdit}>
           <FaRegEdit size={20} />
-        </button>
+        </IconButton>
       </Styled.DetailHeader>
       <Styled.DetailSection>
         <Styled.DetailLabel>설명</Styled.DetailLabel>

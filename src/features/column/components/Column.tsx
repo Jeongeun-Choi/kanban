@@ -8,6 +8,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateColumn } from "../api/patchColumn";
 import ColumnContent from "./ColumnContent";
 import DeleteColumnModal from "./DeleteColumnModal";
+import Input from "../../../shared/components/Input";
+import IconButton from "../../../shared/components/IconButton";
 
 interface ColumnProps {
   id: string;
@@ -105,17 +107,17 @@ export default memo(function Column({
         <Styled.ColumnHeader>
           <Styled.TitleForm onSubmit={handleSubmitTitle}>
             {isEditing ? (
-              <Styled.Title ref={titleRef} defaultValue={title} onBlur={handleBlur} />
+              <Input ref={titleRef} defaultValue={title} onBlur={handleBlur} fullWidth />
             ) : (
               <span onClick={() => setIsEditing(true)}>{title}</span>
             )}
           </Styled.TitleForm>
-          <button onClick={() => setIsEditing(true)}>
+          <IconButton size="small" onClick={() => setIsEditing(true)}>
             <FaRegEdit />
-          </button>
-          <button onClick={() => setModalOpen(true)}>
+          </IconButton>
+          <IconButton size="small" onClick={() => setModalOpen(true)}>
             <FaTrash />
-          </button>
+          </IconButton>
         </Styled.ColumnHeader>
         <ColumnContent
           id={id}

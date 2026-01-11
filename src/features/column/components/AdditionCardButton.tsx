@@ -1,4 +1,5 @@
 import { AdditionCardButtonContainer } from "../styles/styled";
+import Button from "../../../shared/components/Button";
 
 interface AdditionCardButtonProps {
   emptyColumn: boolean;
@@ -11,6 +12,8 @@ export default function AdditionCardButton({ emptyColumn, onClick }: AdditionCar
       카드를 추가해보세요!
     </AdditionCardButtonContainer>
   ) : (
-    <button onClick={onClick}>카드 추가</button>
+    <Button variant="text" fullWidth onClick={onClick}>
+      카드 추가
+    </Button>
   );
 }

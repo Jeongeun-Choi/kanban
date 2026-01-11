@@ -27,15 +27,6 @@ export const TitleForm = styled.form`
   flex: 1;
 `;
 
-export const Title = styled.input`
-  width: 100%;
-  height: 40px;
-  border: none;
-  font-size: 1rem;
-  background-color: transparent;
-  color: var(--text-main);
-`;
-
 export const ColumnContent = styled.ul`
   display: flex;
   flex-direction: column;
@@ -92,12 +83,4 @@ export const CreateColumnButtons = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 0.3rem;
-`;
-
-export const CreateColumnButton = styled.button<{ variant?: "contained" | "outlined" }>`
-  background-color: ${(props) => (props.variant === "contained" ? "#21728dff" : "white")};
-  border: ${(props) => (props.variant === "contained" ? "none" : "1px solid #191919")};
-  color: ${(props) => (props.variant === "contained" ? "white" : "#191919")};
-  padding: 0.5rem;
-  border-radius: 4px;
 `;
