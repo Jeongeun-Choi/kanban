@@ -10,6 +10,7 @@ import ColumnContent from "./ColumnContent";
 import DeleteColumnModal from "./DeleteColumnModal";
 import Input from "../../../shared/components/Input";
 import IconButton from "../../../shared/components/IconButton";
+import { useToast } from "../../../shared/hooks/useToast";
 
 interface ColumnProps {
   id: string;
@@ -52,12 +53,18 @@ export default memo(function Column({
   const [modalOpen, setModalOpen] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const updateMutation = useMutation({
     mutationFn: (newTitle: string) => updateColumn(id, { title: newTitle }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });
+      showToast("컬럼 제목이 수정되었습니다.", "success");
       setIsEditing(false);
+    },
+    onError: (error) => {
+      console.error(error);
+      showToast("컬럼 제목 수정 중 오류가 발생했습니다.", "error");
     },
   });
 

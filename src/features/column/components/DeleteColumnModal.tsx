@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteColumn } from "../api/deleteColumn";
 import Modal from "../../../shared/components/Modal";
 import Button from "../../../shared/components/Button";
+import { useToast } from "../../../shared/hooks/useToast";
 
 interface DeleteColumnModalProps {
   open: boolean;
@@ -11,12 +12,18 @@ interface DeleteColumnModalProps {
 
 export default function DeleteColumnModal({ open, onClose, columnId }: DeleteColumnModalProps) {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteColumn({ id: columnId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });
+      showToast("컬럼이 삭제되었습니다.", "success");
       onClose();
+    },
+    onError: (error) => {
+      console.error(error);
+      showToast("컬럼 삭제 중 오류가 발생했습니다.", "error");
     },
   });
 

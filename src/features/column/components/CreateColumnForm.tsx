@@ -4,6 +4,7 @@ import { createColumn } from "../api/createColumn";
 import { useRef, type FormEvent } from "react";
 import Button from "../../../shared/components/Button";
 import Input from "../../../shared/components/Input";
+import { useToast } from "../../../shared/hooks/useToast";
 
 interface CreateColumnFormProps {
   open: boolean;
@@ -14,6 +15,7 @@ export default function CreateColumnForm({ open, onClose }: CreateColumnFormProp
   const titleRef = useRef<HTMLInputElement | null>(null);
 
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const mutation = useMutation({
     mutationFn: (title?: string) => createColumn({ title }),
@@ -22,20 +24,25 @@ export default function CreateColumnForm({ open, onClose }: CreateColumnFormProp
         titleRef.current.value = "";
       }
       queryClient.invalidateQueries({ queryKey: ["columns"] });
+      showToast("컬럼이 추가되었습니다.", "success");
       onClose?.();
+    },
+    onError: (error) => {
+      console.error(error);
+      showToast("컬럼 추가 중 오류가 발생했습니다.", "error");
     },
   });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    try {
-      await mutation.mutateAsync(titleRef.current?.value);
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      }
+    const title = titleRef.current?.value;
+    if (!title?.trim()) {
+      showToast("컬럼 제목을 입력해주세요.", "warning");
+      return;
     }
+
+    mutation.mutate(title.trim());
   };
 
   if (!open) {
