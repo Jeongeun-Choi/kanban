@@ -1,26 +1,23 @@
-import { useEffect, useRef, useState, type FormEvent, type DragEvent } from "react";
+import { useEffect, useRef, useState, memo, type FormEvent, type DragEvent } from "react";
 
 import * as Styled from "../styles/styled";
-import AdditionCardButton from "./AdditionCardButton";
-import Card from "../../card/components/Card";
 import type { Card as CardType } from "../../../shared/types/kanban";
 import { FaRegEdit, FaTrash } from "react-icons/fa";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateColumn } from "../api/patchColumn";
-import Modal from "../../../shared/components/Modal";
-import { deleteColumn } from "../api/deleteColumn";
-import CreateCardForm from "../../card/components/CreateCardForm";
+import ColumnContent from "./ColumnContent";
+import DeleteColumnModal from "./DeleteColumnModal";
 
 interface ColumnProps {
   id: string;
   title: string;
   cards: CardType[];
   draggable?: boolean;
-  onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
-  onDragOver?: (event: DragEvent<HTMLDivElement>) => void;
-  onDragEnd?: (event: DragEvent<HTMLDivElement>) => void;
-  onDrop?: (event: DragEvent<HTMLDivElement>) => void;
+  onColumnDragStart?: (event: DragEvent<HTMLDivElement>, id: string) => void;
+  onColumnDragOver?: (event: DragEvent<HTMLDivElement>, id: string) => void;
+  onColumnDragEnd?: (event: DragEvent<HTMLDivElement>) => void;
+  onColumnDrop?: (event: DragEvent<HTMLDivElement>) => void;
   isDragging?: boolean;
   onCardDragStart?: (event: DragEvent<HTMLElement>, card: CardType) => void;
   onCardDragOver?: (
@@ -30,26 +27,27 @@ interface ColumnProps {
   ) => void;
   onCardDragEnd?: (event: DragEvent<HTMLElement>) => void;
   draggedCard?: CardType | null;
+  dropIndicator?: { columnId: string; index: number } | null;
 }
 
-export default function Column({
+export default memo(function Column({
   id,
   title,
   cards,
   draggable,
-  onDragStart,
-  onDragOver,
-  onDragEnd,
-  onDrop,
+  onColumnDragStart,
+  onColumnDragOver,
+  onColumnDragEnd,
+  onColumnDrop,
   isDragging,
   onCardDragStart,
   onCardDragOver,
   onCardDragEnd,
   draggedCard,
+  dropIndicator,
 }: ColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [createCardOpen, setCreateCardOpen] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -58,13 +56,6 @@ export default function Column({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });
       setIsEditing(false);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: () => deleteColumn({ id }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["columns"] });
     },
   });
 
@@ -95,7 +86,7 @@ export default function Column({
     <>
       <Styled.ColumnContainer
         draggable={draggable}
-        onDragStart={onDragStart}
+        onDragStart={(e) => onColumnDragStart?.(e, id)}
         onDragOver={(e) => {
           if (draggedCard && onCardDragOver) {
             e.preventDefault();
@@ -103,12 +94,12 @@ export default function Column({
             const cardEl = targetEl?.closest("[data-card-id]");
             const targetCardId = cardEl?.getAttribute("data-card-id") || undefined;
             onCardDragOver(e, id, targetCardId);
-          } else if (onDragOver) {
-            onDragOver(e);
+          } else if (onColumnDragOver) {
+            onColumnDragOver(e, id);
           }
         }}
-        onDragEnd={onDragEnd}
-        onDrop={onDrop}
+        onDragEnd={onColumnDragEnd}
+        onDrop={onColumnDrop}
         isDragging={isDragging}
       >
         <Styled.ColumnHeader>
@@ -126,48 +117,17 @@ export default function Column({
             <FaTrash />
           </button>
         </Styled.ColumnHeader>
-        <Styled.ColumnContent>
-          {cards?.map((card) => (
-            <Card
-              key={card.id}
-              {...card}
-              draggable
-              onCardDragStart={onCardDragStart}
-              onCardDragEnd={onCardDragEnd}
-              isDragging={draggedCard?.id === card.id}
-            />
-          ))}
-          <CreateCardForm
-            open={createCardOpen}
-            columnId={id}
-            onClose={() => setCreateCardOpen(false)}
-          />
-          <AdditionCardButton
-            emptyColumn={cards?.length === 0}
-            onClick={() => setCreateCardOpen(true)}
-          />
-        </Styled.ColumnContent>
+        <ColumnContent
+          id={id}
+          cards={cards}
+          draggedCard={draggedCard}
+          dropIndicator={dropIndicator}
+          onCardDragStart={onCardDragStart}
+          onCardDragEnd={onCardDragEnd}
+          onCardDragOver={onCardDragOver}
+        />
       </Styled.ColumnContainer>
-      <Modal
-        title="Delete column"
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        buttons={[
-          <button
-            onClick={() => {
-              deleteMutation.mutate();
-              setModalOpen(false);
-            }}
-          >
-            Confirm
-          </button>,
-          <button onClick={() => setModalOpen(false)}>Cancel</button>,
-        ]}
-      >
-        <span>컬럼 삭제시 컬럼에 있는 카드들도 모두 삭제됩니다.</span>
-        <br />
-        <span>컬럼을 정말 삭제하시겠습니까?</span>
-      </Modal>
+      <DeleteColumnModal open={modalOpen} onClose={() => setModalOpen(false)} columnId={id} />
     </>
   );
-}
+});

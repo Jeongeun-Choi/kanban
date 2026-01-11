@@ -5,11 +5,15 @@ import type { Card as CardType, Column as ColumnType } from "../../../shared/typ
 
 interface UseCardDragProps {
   localColumns: ColumnType[];
-  setLocalColumns: (columns: ColumnType[]) => void;
 }
 
-export function useCardDrag({ localColumns, setLocalColumns }: UseCardDragProps) {
+export function useCardDrag({ localColumns }: UseCardDragProps) {
   const [draggedCard, setDraggedCard] = useState<CardType | null>(null);
+  const [dropIndicator, setDropIndicator] = useState<{
+    columnId: string;
+    index: number;
+  } | null>(null);
+
   const queryClient = useQueryClient();
 
   const moveCardMutation = useMutation({
@@ -22,8 +26,41 @@ export function useCardDrag({ localColumns, setLocalColumns }: UseCardDragProps)
       target_column_id: string;
       new_order: number;
     }) => moveCard(id, { target_column_id, new_order }),
+    onMutate: async ({ id, target_column_id, new_order }) => {
+      await queryClient.cancelQueries({ queryKey: ["columns"] });
+      const previousColumns = queryClient.getQueryData<ColumnType[]>(["columns"]);
+
+      if (previousColumns) {
+        const newColumns = structuredClone(previousColumns);
+        const sourceColumn = newColumns.find((col: ColumnType) =>
+          col.cards.some((c) => c.id === id)
+        );
+        const targetColumn = newColumns.find((col: ColumnType) => col.id === target_column_id);
+
+        if (sourceColumn && targetColumn) {
+          const sourceIndex = sourceColumn.cards.findIndex((c: CardType) => c.id === id);
+          if (sourceIndex !== -1) {
+            const [movedCard] = sourceColumn.cards.splice(sourceIndex, 1);
+            movedCard.column_id = target_column_id;
+            targetColumn.cards.splice(new_order, 0, movedCard);
+            queryClient.setQueryData(["columns"], newColumns);
+          }
+        }
+      }
+
+      return { previousColumns };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousColumns) {
+        queryClient.setQueryData(["columns"], context.previousColumns);
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });
+    },
+    onSettled: () => {
+      setDraggedCard(null);
+      setDropIndicator(null);
     },
   });
 
@@ -38,76 +75,73 @@ export function useCardDrag({ localColumns, setLocalColumns }: UseCardDragProps)
       event.stopPropagation();
       if (!draggedCard) return;
 
-      // 현재 카드가 어디에 있는지 찾기 (Source Column)
-      const sourceColumn = localColumns.find((col) =>
-        col.cards.some((card) => card.id === draggedCard.id)
-      );
       const targetColumn = localColumns.find((col) => col.id === targetColumnId);
-      if (!sourceColumn || !targetColumn) return;
+      if (!targetColumn) return;
 
-      // 같은 위치면 무시 (하지만 카드가 서로 다른 경우 순서 변경 필요)
-      if (sourceColumn.id === targetColumn.id && draggedCard.id === targetCardId) return;
+      const hoveredIndex = targetCardId
+        ? targetColumn.cards.findIndex((card) => card.id === targetCardId)
+        : -1;
 
-      const newColumns = [...localColumns];
-      const newSourceColumn = newColumns.find((col) => col.id === sourceColumn.id);
-      const newTargetColumn = newColumns.find((col) => col.id === targetColumnId);
+      let targetIndex: number;
 
-      if (!newSourceColumn || !newTargetColumn) return;
-
-      const sourceIndex = newSourceColumn.cards.findIndex((card) => card.id === draggedCard.id);
-      const targetIndex = targetCardId
-        ? newTargetColumn.cards.findIndex((card) => card.id === targetCardId)
-        : newTargetColumn.cards.length; // 빈 공간이나 컬럼 자체에 드롭할 때
-
-      // 같은 컬럼 내 이동
-      if (newSourceColumn.id === newTargetColumn.id) {
-        const [movedCard] = newSourceColumn.cards.splice(sourceIndex, 1);
-        newSourceColumn.cards.splice(targetIndex, 0, movedCard);
-      }
-      // 다른 컬럼으로 이동
-      else {
-        const [movedCard] = newSourceColumn.cards.splice(sourceIndex, 1);
-        // 중요: 이동한 카드의 소속 컬럼 ID 정보를 업데이트!
-        movedCard.column_id = targetColumnId;
-        newTargetColumn.cards.splice(targetIndex, 0, movedCard);
+      if (hoveredIndex !== -1) {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const isBottomHalf = event.clientY > rect.top + rect.height / 2;
+        targetIndex = isBottomHalf ? hoveredIndex + 1 : hoveredIndex;
+      } else {
+        targetIndex = targetColumn.cards.length;
       }
 
-      setLocalColumns(newColumns);
+      setDropIndicator((prev) => {
+        if (prev?.columnId === targetColumnId && prev?.index === targetIndex) {
+          return prev;
+        }
+        return { columnId: targetColumnId, index: targetIndex };
+      });
     },
-    [draggedCard, localColumns, setLocalColumns]
+    [draggedCard, localColumns]
   );
 
-  const handleCardDragEnd = useCallback((event: DragEvent<HTMLElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleCardDragEnd = useCallback((event?: DragEvent<HTMLElement> | Event) => {
+    event?.preventDefault?.();
     setDraggedCard(null);
+    setDropIndicator(null);
   }, []);
 
   const handleCardDrop = useCallback(
-    (event: DragEvent<HTMLElement>, targetColumnId: string) => {
+    (event: DragEvent<HTMLElement>) => {
       event.preventDefault();
-      event.stopPropagation();
 
-      if (draggedCard) {
-        const targetColumn = localColumns.find((col) => col.id === targetColumnId);
-        if (targetColumn) {
-          const newIndex = targetColumn.cards.findIndex((c) => c.id === draggedCard.id);
-          if (newIndex !== -1) {
-            moveCardMutation.mutate({
-              id: draggedCard.id,
-              target_column_id: targetColumn.id,
-              new_order: newIndex,
-            });
-          }
-        }
-        setDraggedCard(null);
-      }
+      if (!draggedCard || !dropIndicator) return;
+
+      const { columnId: targetColumnId, index: targetIndex } = dropIndicator;
+
+      const sourceColumn = localColumns.find((col: ColumnType) =>
+        col.cards.some((c) => c.id === draggedCard.id)
+      );
+      const targetColumn = localColumns.find((col: ColumnType) => col.id === targetColumnId);
+
+      if (!sourceColumn || !targetColumn) return;
+
+      const sourceIndex = sourceColumn.cards.findIndex((c: CardType) => c.id === draggedCard.id);
+      if (sourceIndex === -1) return;
+
+      const isSameColumn = sourceColumn.id === targetColumn.id;
+      const movingDown = sourceIndex < targetIndex;
+      const finalIndex = isSameColumn && movingDown ? Math.max(0, targetIndex - 1) : targetIndex;
+
+      moveCardMutation.mutate({
+        id: draggedCard.id,
+        target_column_id: targetColumnId,
+        new_order: finalIndex,
+      });
     },
-    [draggedCard, localColumns, moveCardMutation]
+    [draggedCard, dropIndicator, localColumns, moveCardMutation]
   );
 
   return {
     draggedCard,
+    dropIndicator,
     handleCardDragStart,
     handleCardDragOver,
     handleCardDragEnd,

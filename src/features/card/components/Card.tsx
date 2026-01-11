@@ -17,6 +17,7 @@ interface Card {
   draggable?: boolean;
   onCardDragStart?: (event: DragEvent<HTMLElement>, card: Card) => void;
   onCardDragEnd?: (event: DragEvent<HTMLElement>) => void;
+  onCardDragOver?: (event: DragEvent<HTMLElement>, columnId: string, cardId: string) => void;
   isDragging?: boolean;
 }
 
@@ -32,6 +33,7 @@ const Card = memo(function Card({
   draggable,
   onCardDragStart,
   onCardDragEnd,
+  onCardDragOver,
   isDragging,
 }: Card) {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -71,12 +73,18 @@ const Card = memo(function Card({
     },
     [onCardDragStart, id, title, column_id, description, due_date, order, created_at, updated_at]
   );
-
   const handleDragEnd = useCallback(
     (e: DragEvent<HTMLLIElement>) => {
       onCardDragEnd?.(e);
     },
     [onCardDragEnd]
+  );
+
+  const handleDragOver = useCallback(
+    (e: DragEvent<HTMLLIElement>) => {
+      onCardDragOver?.(e, column_id, id);
+    },
+    [onCardDragOver, column_id, id]
   );
 
   return (
@@ -86,6 +94,7 @@ const Card = memo(function Card({
         draggable={draggable}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        onDragOver={handleDragOver}
         isDragging={isDragging}
         data-card-id={id}
       >
