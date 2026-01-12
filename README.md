@@ -18,12 +18,14 @@ Drag & Drop을 통한 직관적인 태스크 관리와 실시간 검증, 전역 
 # 의존성 설치
 npm install
 
-# 개발 서버 실행 (Frontend + Mock Server 동시 실행)
+# 프론트 실행
 npm run dev
 
-# 별도 터미널에서 Mock Server만 실행 필요 시
+# Mock Server 실행
 npm run server
 ```
+
+> 브라우저가 자동으로 열리지 않는다면 [http://localhost:5173](http://localhost:5173)으로 접속해주세요.
 
 ## 기술 스택
 
