@@ -161,10 +161,11 @@ export default memo(function Column({
             size="small"
             onClick={() => setIsEditing(true)}
             loading={updateMutation.isPending}
+            aria-label="Edit column title"
           >
             <FaRegEdit />
           </IconButton>
-          <IconButton size="small" onClick={() => setModalOpen(true)}>
+          <IconButton size="small" onClick={() => setModalOpen(true)} aria-label="Delete column">
             <FaTrash />
           </IconButton>
         </Styled.ColumnHeader>

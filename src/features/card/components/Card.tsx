@@ -108,7 +108,7 @@ const Card = memo(function Card({
       >
         <Styled.CardTitle>
           <span>{title}</span>
-          <IconButton size="small" onClick={handleDelete}>
+          <IconButton size="small" onClick={handleDelete} aria-label="Delete card">
             <FaTrash />
           </IconButton>
         </Styled.CardTitle>
