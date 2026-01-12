@@ -13,23 +13,18 @@ interface CreateColumnFormProps {
 }
 
 export default function CreateColumnForm({ open, onClose }: CreateColumnFormProps) {
+  const { showToast } = useToast();
   const {
     value: title,
-    handleChange: handleInputChange,
+    handleChange: handleChangeTitle,
     setValue: setTitle,
-  } = useInput({ initialValue: "" });
+  } = useInput({
+    initialValue: "",
+    maxLength: 50,
+    onLimitReached: () => showToast("컬럼 제목은 50자 이하로 입력해주세요.", "warning"),
+  });
 
   const queryClient = useQueryClient();
-  const { showToast } = useToast();
-
-  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    if (newValue.length >= 50) {
-      showToast("컬럼 제목은 50자 이하로 입력해주세요.", "warning");
-      return;
-    }
-    handleInputChange(e);
-  };
 
   const mutation = useMutation({
     mutationFn: (title?: string) => createColumn({ title }),

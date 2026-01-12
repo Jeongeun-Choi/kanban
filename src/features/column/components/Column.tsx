@@ -52,24 +52,19 @@ export default memo(function Column({
 }: ColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const { showToast } = useToast();
 
   const {
     value: editTitle,
-    handleChange: handleInputChange,
+    handleChange: handleChangeTitle,
     setValue: setEditTitle,
-  } = useInput({ initialValue: title });
+  } = useInput({
+    initialValue: title,
+    maxLength: 50,
+    onLimitReached: () => showToast("컬럼 제목은 50자 이하로 입력해주세요.", "warning"),
+  });
 
   const queryClient = useQueryClient();
-  const { showToast } = useToast();
-
-  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    if (newValue.length >= 50) {
-      showToast("컬럼 제목은 50자 이하로 입력해주세요.", "warning");
-      return;
-    }
-    handleInputChange(e);
-  };
 
   const updateMutation = useMutation({
     mutationFn: (newTitle: string) => updateColumn(id, { title: newTitle }),
