@@ -4,7 +4,7 @@ import { FaTrash, FaExclamationCircle } from "react-icons/fa";
 import * as Styled from "../styles/styled";
 import { deleteCard } from "../api/deleteCard";
 import CardDetailModal from "./CardDetailModal";
-import IconButton from "../../../shared/components/IconButton";
+import IconButton from "../../../shared/components/Button/IconButton";
 import { isOverdue as checkOverdue } from "../../../shared/utils/date";
 import { useToast } from "../../../shared/hooks/useToast";
 

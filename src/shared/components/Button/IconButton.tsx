@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { type ButtonHTMLAttributes, type ReactNode, type Ref } from "react";
-import Spinner from "./Spinner";
+import Spinner from "../Loading/Spinner";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;

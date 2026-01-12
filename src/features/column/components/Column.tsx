@@ -9,7 +9,7 @@ import { updateColumn } from "../api/patchColumn";
 import ColumnContent from "./ColumnContent";
 import DeleteColumnModal from "./DeleteColumnModal";
 import Input from "../../../shared/components/Input";
-import IconButton from "../../../shared/components/IconButton";
+import IconButton from "../../../shared/components/Button/IconButton"; // Direct import to fix resolution issue
 import { useToast } from "../../../shared/hooks/useToast";
 import useInput from "../../../shared/hooks/useInput";
 

@@ -3,7 +3,7 @@ import { FaRegEdit, FaExclamationCircle } from "react-icons/fa";
 import * as Styled from "../styles/styled";
 import type { Card } from "../../../shared/types/kanban";
 import { deleteCard } from "../api/deleteCard";
-import IconButton from "../../../shared/components/IconButton";
+import IconButton from "../../../shared/components/Button/IconButton";
 import { isOverdue as checkOverdue } from "../../../shared/utils/date";
 import { useToast } from "../../../shared/hooks/useToast";
 

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import Skeleton from "../../../shared/components/Skeleton";
+import Skeleton from "../../../shared/components/Loading/Skeleton";
 import * as Styled from "../../column/styles/styled";
 import { SKELETON_COUNTS } from "../../../shared/constants/index";
 
