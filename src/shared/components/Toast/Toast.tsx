@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import { useEffect } from "react";
 import {
   FaCheckCircle,
   FaExclamationCircle,
@@ -7,49 +6,18 @@ import {
   FaExclamationTriangle,
 } from "react-icons/fa";
 import type { ToastType } from "../../types/toast";
+import BaseToast from "./BaseToast";
 
 interface ToastProps {
   message: string;
   type: ToastType;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  duration?: number;
   onClose: () => void;
 }
-
-const ToastItem = styled.div<{ type: ToastType }>`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 300px;
-  max-width: 450px;
-  animation: slideIn 0.3s ease-out;
-  border-left: 5px solid
-    ${({ type }) => {
-      switch (type) {
-        case "success":
-          return "#2da44e";
-        case "error":
-          return "#d73a49";
-        case "warning":
-          return "#eabb26";
-        default:
-          return "#3b82f6";
-      }
-    }};
-
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-`;
 
 const IconWrapper = styled.div<{ type: ToastType }>`
   font-size: 1.25rem;
@@ -74,6 +42,28 @@ const Message = styled.span`
   font-size: 0.875rem;
   font-weight: 500;
   flex: 1;
+  line-height: 1.4;
+`;
+
+const ActionButton = styled.button`
+  background-color: var(--bg-column, #f6f8fa);
+  border: 1px solid var(--border-color, #e1e4e8);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-main, #24292e);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--border-color, #e1e4e8);
+  }
+
+  &:active {
+    background-color: #d1d5da;
+  }
 `;
 
 const CloseButton = styled.button`
@@ -82,8 +72,11 @@ const CloseButton = styled.button`
   color: #999;
   cursor: pointer;
   padding: 0.25rem;
-  font-size: 1rem;
+  font-size: 1.25rem;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   &:hover {
     color: #333;
   }
@@ -102,20 +95,18 @@ const getIcon = (type: ToastType) => {
   }
 };
 
-export default function Toast({ message, type, onClose }: ToastProps) {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [onClose]);
+export default function Toast({ message, type, action, duration = 3000, onClose }: ToastProps) {
+  const handleActionClick = () => {
+    action?.onClick();
+    onClose();
+  };
 
   return (
-    <ToastItem type={type}>
+    <BaseToast type={type} duration={duration} onClose={onClose}>
       <IconWrapper type={type}>{getIcon(type)}</IconWrapper>
       <Message>{message}</Message>
+      {action && <ActionButton onClick={handleActionClick}>{action.label}</ActionButton>}
       <CloseButton onClick={onClose}>&times;</CloseButton>
-    </ToastItem>
+    </BaseToast>
   );
 }
