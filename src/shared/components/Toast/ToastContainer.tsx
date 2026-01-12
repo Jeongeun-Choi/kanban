@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import Toast from "./Toast";
+import ErrorToast from "./ErrorToast";
 import type { Toast as ToastType } from "../../types/toast";
 
 interface ToastContainerProps {
@@ -25,14 +26,26 @@ const Container = styled.div`
 export default function ToastContainer({ toasts, removeToast }: ToastContainerProps) {
   return (
     <Container>
-      {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onClose={() => removeToast(toast.id)}
-        />
-      ))}
+      {toasts.map((toast) =>
+        toast.type === "error" ? (
+          <ErrorToast
+            key={toast.id}
+            message={toast.message}
+            action={toast.action}
+            duration={toast.duration}
+            onClose={() => removeToast(toast.id)}
+          />
+        ) : (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            type={toast.type}
+            action={toast.action}
+            duration={toast.duration}
+            onClose={() => removeToast(toast.id)}
+          />
+        )
+      )}
     </Container>
   );
 }
