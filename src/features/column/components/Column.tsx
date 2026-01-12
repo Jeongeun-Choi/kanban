@@ -98,9 +98,6 @@ export default memo(function Column({
 
   const handleBlur = () => {
     if (!validateEditTitle()) {
-      // If invalid, revert or keep editing? Standard UX usually reverts or shows error.
-      // Let's keep the error and prevent submission, but UI will stay in editing mode if there's an error?
-      // Actually, if it's empty, we might want to revert if the user clicks away.
       if (!editTitle.trim()) {
         setIsEditing(false);
         setEditTitle(title);

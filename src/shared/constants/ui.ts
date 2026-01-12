@@ -11,3 +11,8 @@ export const PLACEHOLDERS = {
   ENTER_TITLE: "Enter a title...",
   ENTER_NOTE: "Enter a note...",
 } as const;
+
+export const SKELETON_COUNTS = {
+  COLUMNS: 3,
+  CARDS: 4,
+} as const;

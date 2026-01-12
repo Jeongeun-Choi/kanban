@@ -55,6 +55,8 @@ const Card = memo(function Card({
     },
   });
 
+  const isOverdue = checkOverdue(due_date);
+
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
@@ -91,8 +93,6 @@ const Card = memo(function Card({
     },
     [onCardDragOver, column_id, id]
   );
-
-  const isOverdue = checkOverdue(due_date);
 
   return (
     <>
