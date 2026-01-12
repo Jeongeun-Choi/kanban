@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { FaExclamationTriangle } from "react-icons/fa";
-import { useEffect } from "react";
+import BaseToast from "./BaseToast";
 
 interface ErrorToastProps {
   message: string;
@@ -12,35 +12,15 @@ interface ErrorToastProps {
   onClose: () => void;
 }
 
-const ErrorToastItem = styled.div`
-  display: flex;
+const StyledErrorToast = styled(BaseToast)`
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(215, 58, 73, 0.2);
-  min-width: 320px;
-  max-width: 500px;
-  animation: slideIn 0.3s ease-out;
-  border-left: 5px solid #d73a49;
-
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
+  width: 100%;
 `;
 
 const IconWrapper = styled.div`
@@ -77,6 +57,7 @@ const ActionArea = styled.div`
   border-top: 1px solid var(--border-color, #e1e4e8);
   padding-top: 0.75rem;
   margin-top: 0.25rem;
+  width: 100%;
 `;
 
 const ActionButton = styled.button`
@@ -113,23 +94,13 @@ const CloseButton = styled.button`
 `;
 
 export default function ErrorToast({ message, action, duration = 0, onClose }: ErrorToastProps) {
-  useEffect(() => {
-    if (duration === 0) return;
-
-    const timer = setTimeout(() => {
-      onClose();
-    }, duration);
-
-    return () => clearTimeout(timer);
-  }, [onClose, duration]);
-
   const handleActionClick = () => {
     action?.onClick();
     onClose();
   };
 
   return (
-    <ErrorToastItem>
+    <StyledErrorToast type="error" duration={duration} onClose={onClose}>
       <ContentWrapper>
         <IconWrapper>
           <FaExclamationTriangle />
@@ -145,6 +116,6 @@ export default function ErrorToast({ message, action, duration = 0, onClose }: E
           <ActionButton onClick={handleActionClick}>{action.label}</ActionButton>
         </ActionArea>
       )}
-    </ErrorToastItem>
+    </StyledErrorToast>
   );
 }

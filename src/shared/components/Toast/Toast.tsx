@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import { useEffect } from "react";
 import {
   FaCheckCircle,
   FaExclamationCircle,
@@ -7,6 +6,7 @@ import {
   FaExclamationTriangle,
 } from "react-icons/fa";
 import type { ToastType } from "../../types/toast";
+import BaseToast from "./BaseToast";
 
 interface ToastProps {
   message: string;
@@ -18,43 +18,6 @@ interface ToastProps {
   duration?: number;
   onClose: () => void;
 }
-
-const ToastItem = styled.div<{ type: ToastType }>`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 320px;
-  max-width: 500px;
-  animation: slideIn 0.3s ease-out;
-  border-left: 5px solid
-    ${({ type }) => {
-      switch (type) {
-        case "success":
-          return "#2da44e";
-        case "error":
-          return "#d73a49";
-        case "warning":
-          return "#eabb26";
-        default:
-          return "#3b82f6";
-      }
-    }};
-
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-`;
 
 const IconWrapper = styled.div<{ type: ToastType }>`
   font-size: 1.25rem;
@@ -133,27 +96,17 @@ const getIcon = (type: ToastType) => {
 };
 
 export default function Toast({ message, type, action, duration = 3000, onClose }: ToastProps) {
-  useEffect(() => {
-    if (duration === 0) return;
-
-    const timer = setTimeout(() => {
-      onClose();
-    }, duration);
-
-    return () => clearTimeout(timer);
-  }, [onClose, duration]);
-
   const handleActionClick = () => {
     action?.onClick();
     onClose();
   };
 
   return (
-    <ToastItem type={type}>
+    <BaseToast type={type} duration={duration} onClose={onClose}>
       <IconWrapper type={type}>{getIcon(type)}</IconWrapper>
       <Message>{message}</Message>
       {action && <ActionButton onClick={handleActionClick}>{action.label}</ActionButton>}
       <CloseButton onClick={onClose}>&times;</CloseButton>
-    </ToastItem>
+    </BaseToast>
   );
 }

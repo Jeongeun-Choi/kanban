@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../hooks/useToast";
+import { isNetworkError } from "../../utils/network";
 
 export default function GlobalErrorListener() {
   const queryClient = useQueryClient();
@@ -12,12 +13,11 @@ export default function GlobalErrorListener() {
       const queryKeyString = JSON.stringify(event.query.queryKey);
 
       if (event.type === "updated" && event.action.type === "error") {
-        const error = event.action.error as Error;
-        const isNetworkError = !navigator.onLine || error.message.includes("Failed to fetch");
+        const error = event.action.error;
+        const netError = isNetworkError(error);
         const hasBeenRetried = manualRetryKeys.current.has(queryKeyString);
 
-        if (isNetworkError && !hasBeenRetried) {
-          // 네트워크 에러이면서 아직 재시도 전인 경우에만 재시도 버튼 제공
+        if (netError && !hasBeenRetried) {
           showToast("네트워크 연결이 불안정합니다. 연결 상태를 확인해 주세요.", "error", {
             action: {
               label: "다시 요청",
@@ -28,13 +28,11 @@ export default function GlobalErrorListener() {
             },
             duration: 0,
           });
-        } else if (isNetworkError && hasBeenRetried) {
-          // 네트워크 에러 재시도 실패
+        } else if (netError && hasBeenRetried) {
           showToast("네트워크 연결에 다시 실패했습니다.", "error");
           manualRetryKeys.current.delete(queryKeyString);
         } else {
-          // 일반 서비스 에러 (버튼 없음)
-          showToast(error.message || "오류가 발생했습니다.", "error");
+          showToast((error as Error).message || "오류가 발생했습니다.", "error");
         }
       }
 
@@ -45,13 +43,11 @@ export default function GlobalErrorListener() {
 
     const unsubscribeMutation = queryClient.getMutationCache().subscribe((event) => {
       if (event.type === "updated" && event.action.type === "error") {
-        const error = event.action.error as Error;
-        const isNetworkError = !navigator.onLine || error.message.includes("Failed to fetch");
-
-        if (isNetworkError) {
+        const error = event.action.error;
+        if (isNetworkError(error)) {
           showToast("네트워크 연결이 오프라인 상태입니다.", "error");
         } else {
-          showToast(error.message || "요청 처리 중 오류가 발생했습니다.", "error");
+          showToast((error as Error).message || "요청 처리 중 오류가 발생했습니다.", "error");
         }
       }
     });
