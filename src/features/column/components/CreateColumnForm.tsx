@@ -18,9 +18,12 @@ export default function CreateColumnForm({ open, onClose }: CreateColumnFormProp
     value: title,
     handleChange: handleChangeTitle,
     setValue: setTitle,
+    error,
+    validate,
   } = useInput({
     initialValue: "",
     maxLength: 50,
+    required: true,
     onLimitReached: () => showToast("컬럼 제목은 50자 이하로 입력해주세요.", "warning"),
   });
 
@@ -43,8 +46,7 @@ export default function CreateColumnForm({ open, onClose }: CreateColumnFormProp
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!title?.trim()) {
-      showToast("컬럼 제목을 입력해주세요.", "warning");
+    if (!validate()) {
       return;
     }
 
@@ -63,6 +65,7 @@ export default function CreateColumnForm({ open, onClose }: CreateColumnFormProp
         placeholder="Column title"
         fullWidth
         maxLength={50}
+        error={error}
       />
       <Styled.CreateColumnButtons>
         <Button type="submit" variant="contained" loading={mutation.isPending}>

@@ -25,6 +25,8 @@ function App() {
   const { data: columns = [], isLoading } = useQuery({
     queryKey: ["columns"],
     queryFn: () => getColumns(),
+    staleTime: 1 * 60 * 1000, // 1 minute
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const {

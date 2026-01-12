@@ -23,15 +23,20 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
     value: title,
     handleChange: handleChangeTitle,
     setValue: setTitle,
+    error: titleError,
+    validate: validateTitle,
   } = useInput({
     initialValue: "",
     maxLength: 100,
+    required: true,
     onLimitReached: () => showToast("제목은 100자 이하로 입력해주세요.", "warning"),
   });
   const {
     value: description,
     handleChange: handleChangeDescription,
     setValue: setDescription,
+    error: descriptionError,
+    validate: validateDescription,
   } = useInput({
     initialValue: "",
     maxLength: 1000,
@@ -104,8 +109,10 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!title) {
-      showToast("제목을 입력해주세요.", "warning");
+    const isTitleValid = validateTitle();
+    const isDescriptionValid = validateDescription();
+
+    if (!isTitleValid || !isDescriptionValid) {
       return;
     }
 
@@ -129,6 +136,7 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
         fullWidth
         maxLength={100}
         onChange={handleChangeTitle}
+        error={titleError}
       />
       <Textarea
         value={description}
@@ -136,6 +144,7 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
         fullWidth
         maxLength={1000}
         onChange={handleChangeDescription}
+        error={descriptionError}
       />
       <Input value={dueDate} type="date" fullWidth onChange={handleChangeDueDate} />
       <Styled.CreateCardButtons>
