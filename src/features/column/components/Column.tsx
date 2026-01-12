@@ -58,9 +58,12 @@ export default memo(function Column({
     value: editTitle,
     handleChange: handleChangeTitle,
     setValue: setEditTitle,
+    error: editTitleError,
+    validate: validateEditTitle,
   } = useInput({
     initialValue: title,
     maxLength: 50,
+    required: true,
     onLimitReached: () => showToast("컬럼 제목은 50자 이하로 입력해주세요.", "warning"),
   });
 
@@ -81,20 +84,35 @@ export default memo(function Column({
 
   const handleSubmitTitle = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (editTitle?.trim() && editTitle.trim() !== title) {
+
+    if (!validateEditTitle()) {
+      return;
+    }
+
+    if (editTitle.trim() !== title) {
       updateMutation.mutate(editTitle.trim());
     } else {
       setIsEditing(false);
-      setEditTitle(title);
     }
   };
 
   const handleBlur = () => {
-    if (editTitle?.trim() && editTitle.trim() !== title) {
+    if (!validateEditTitle()) {
+      // If invalid, revert or keep editing? Standard UX usually reverts or shows error.
+      // Let's keep the error and prevent submission, but UI will stay in editing mode if there's an error?
+      // Actually, if it's empty, we might want to revert if the user clicks away.
+      if (!editTitle.trim()) {
+        setIsEditing(false);
+        setEditTitle(title);
+        return;
+      }
+      return;
+    }
+
+    if (editTitle.trim() !== title) {
       updateMutation.mutate(editTitle.trim());
     } else {
       setIsEditing(false);
-      setEditTitle(title);
     }
   };
 
@@ -136,6 +154,7 @@ export default memo(function Column({
                 autoFocus
                 maxLength={50}
                 disabled={updateMutation.isPending}
+                error={editTitleError}
               />
             ) : (
               <Styled.ColumnTitle onClick={() => setIsEditing(true)}>{title}</Styled.ColumnTitle>

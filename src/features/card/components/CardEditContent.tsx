@@ -21,13 +21,24 @@ interface CardEditContentProps {
 export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditContentProps) {
   const { showToast } = useToast();
 
-  const { value: title, handleChange: handleChangeTitle } = useInput({
+  const {
+    value: title,
+    handleChange: handleChangeTitle,
+    error: titleError,
+    validate: validateTitle,
+  } = useInput({
     initialValue: card.title,
     maxLength: 100,
+    required: true,
     onLimitReached: () => showToast("제목은 100자 이하로 입력해주세요.", "warning"),
   });
-  const { value: description, handleChange: handleChangeDescription } = useInput({
-    initialValue: card.description,
+  const {
+    value: description,
+    handleChange: handleChangeDescription,
+    error: descriptionError,
+    validate: validateDescription,
+  } = useInput({
+    initialValue: card.description || "",
     maxLength: 1000,
     onLimitReached: () => showToast("설명은 1000자 이하로 입력해주세요.", "warning"),
   });
@@ -87,8 +98,10 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!title) {
-      showToast("제목을 입력해주세요.", "warning");
+    const isTitleValid = validateTitle();
+    const isDescriptionValid = validateDescription();
+
+    if (!isTitleValid || !isDescriptionValid) {
       return;
     }
 
@@ -126,6 +139,7 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
           onChange={handleChangeTitle}
           fullWidth
           maxLength={100}
+          error={titleError}
         />
       </Styled.InputGroup>
       <Styled.InputGroup>
@@ -136,6 +150,7 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
           onChange={handleChangeDescription}
           fullWidth
           maxLength={1000}
+          error={descriptionError}
         />
       </Styled.InputGroup>
       <Styled.InputGroup>
