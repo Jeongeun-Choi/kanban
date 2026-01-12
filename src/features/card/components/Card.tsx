@@ -6,6 +6,7 @@ import { deleteCard } from "../api/deleteCard";
 import CardDetailModal from "./CardDetailModal";
 import IconButton from "../../../shared/components/IconButton";
 import { isOverdue as checkOverdue } from "../../../shared/utils/date";
+import { useToast } from "../../../shared/hooks/useToast";
 
 interface Card {
   id: string;
@@ -40,15 +41,17 @@ const Card = memo(function Card({
 }: Card) {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const mutation = useMutation({
     mutationFn: (cardId: string) => deleteCard(cardId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });
+      showToast("카드가 삭제되었습니다.", "success");
     },
     onError: (error) => {
       console.error(error);
-      alert("카드 삭제 중 오류가 발생했습니다.");
+      showToast("카드 삭제 중 오류가 발생했습니다.", "error");
     },
   });
 

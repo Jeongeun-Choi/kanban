@@ -2,6 +2,7 @@ import { useState, useCallback, type DragEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateColumn } from "../api/patchColumn";
 import type { Column as ColumnType } from "../../../shared/types/kanban";
+import { useToast } from "../../../shared/hooks/useToast";
 
 interface UseColumnDragProps {
   columns: ColumnType[];
@@ -14,6 +15,7 @@ export function useColumnDrag({ columns }: UseColumnDragProps) {
   } | null>(null);
 
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const updateOrderMutation = useMutation({
     mutationFn: (newColumns: ColumnType[]) => {
@@ -30,6 +32,7 @@ export function useColumnDrag({ columns }: UseColumnDragProps) {
       if (context?.previousColumns) {
         queryClient.setQueryData(["columns"], context.previousColumns);
       }
+      showToast("컬럼 순서 변경 중 오류가 발생했습니다.", "error");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });

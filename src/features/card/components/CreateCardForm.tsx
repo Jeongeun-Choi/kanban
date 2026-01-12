@@ -8,6 +8,7 @@ import Input from "../../../shared/components/Input";
 import Textarea from "../../../shared/components/Textarea";
 import useInput from "../../../shared/hooks/useInput";
 import type { Column, Card } from "../../../shared/types/kanban";
+import { useToast } from "../../../shared/hooks/useToast";
 
 interface CreateCardFormProps {
   open: boolean;
@@ -16,12 +17,16 @@ interface CreateCardFormProps {
 }
 
 export default function CreateCardForm({ open, columnId, onClose }: CreateCardFormProps) {
+  const { showToast } = useToast();
+
   const {
     value: title,
     handleChange: handleChangeTitle,
     setValue: setTitle,
   } = useInput({
     initialValue: "",
+    maxLength: 100,
+    onLimitReached: () => showToast("제목은 100자 이하로 입력해주세요.", "warning"),
   });
   const {
     value: description,
@@ -29,6 +34,8 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
     setValue: setDescription,
   } = useInput({
     initialValue: "",
+    maxLength: 1000,
+    onLimitReached: () => showToast("설명은 1000자 이하로 입력해주세요.", "warning"),
   });
   const {
     value: dueDate,
@@ -79,7 +86,7 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
       setTitle("");
       setDescription("");
       setDueDate("");
-
+      showToast("카드가 추가되었습니다.", "success");
       onClose();
     },
     onError: (err, _, context) => {
@@ -87,6 +94,7 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
         queryClient.setQueryData(["columns"], context.previousColumns);
       }
       console.error(err);
+      showToast("카드 추가 중 오류가 발생했습니다.", "error");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });
@@ -97,12 +105,7 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
     event.preventDefault();
 
     if (!title) {
-      alert("Title is required");
-      return;
-    }
-
-    if (title.length > 100) {
-      alert("Title must be 100 characters or less");
+      showToast("제목을 입력해주세요.", "warning");
       return;
     }
 

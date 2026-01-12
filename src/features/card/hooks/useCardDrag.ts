@@ -2,6 +2,7 @@ import { useState, useCallback, type DragEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { moveCard } from "../api/moveCard";
 import type { Card as CardType, Column as ColumnType } from "../../../shared/types/kanban";
+import { useToast } from "../../../shared/hooks/useToast";
 
 interface UseCardDragProps {
   localColumns: ColumnType[];
@@ -15,6 +16,7 @@ export function useCardDrag({ localColumns }: UseCardDragProps) {
   } | null>(null);
 
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const moveCardMutation = useMutation({
     mutationFn: ({
@@ -54,6 +56,7 @@ export function useCardDrag({ localColumns }: UseCardDragProps) {
       if (context?.previousColumns) {
         queryClient.setQueryData(["columns"], context.previousColumns);
       }
+      showToast("카드 이동 중 오류가 발생했습니다.", "error");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });

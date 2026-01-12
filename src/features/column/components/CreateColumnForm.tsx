@@ -1,9 +1,11 @@
 import * as Styled from "../styles/styled";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createColumn } from "../api/createColumn";
-import { useRef, type FormEvent } from "react";
+import { type FormEvent } from "react";
 import Button from "../../../shared/components/Button";
 import Input from "../../../shared/components/Input";
+import { useToast } from "../../../shared/hooks/useToast";
+import useInput from "../../../shared/hooks/useInput";
 
 interface CreateColumnFormProps {
   open: boolean;
@@ -11,31 +13,42 @@ interface CreateColumnFormProps {
 }
 
 export default function CreateColumnForm({ open, onClose }: CreateColumnFormProps) {
-  const titleRef = useRef<HTMLInputElement | null>(null);
+  const { showToast } = useToast();
+  const {
+    value: title,
+    handleChange: handleChangeTitle,
+    setValue: setTitle,
+  } = useInput({
+    initialValue: "",
+    maxLength: 50,
+    onLimitReached: () => showToast("컬럼 제목은 50자 이하로 입력해주세요.", "warning"),
+  });
 
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: (title?: string) => createColumn({ title }),
     onSuccess: () => {
-      if (titleRef.current) {
-        titleRef.current.value = "";
-      }
+      setTitle("");
       queryClient.invalidateQueries({ queryKey: ["columns"] });
+      showToast("컬럼이 추가되었습니다.", "success");
       onClose?.();
+    },
+    onError: (error) => {
+      console.error(error);
+      showToast("컬럼 추가 중 오류가 발생했습니다.", "error");
     },
   });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    try {
-      await mutation.mutateAsync(titleRef.current?.value);
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      }
+    if (!title?.trim()) {
+      showToast("컬럼 제목을 입력해주세요.", "warning");
+      return;
     }
+
+    mutation.mutate(title.trim());
   };
 
   if (!open) {
@@ -44,7 +57,13 @@ export default function CreateColumnForm({ open, onClose }: CreateColumnFormProp
 
   return (
     <Styled.CreateColumnForm onSubmit={handleSubmit}>
-      <Input ref={titleRef} placeholder="Column title" fullWidth />
+      <Input
+        value={title}
+        onChange={handleChangeTitle}
+        placeholder="Column title"
+        fullWidth
+        maxLength={50}
+      />
       <Styled.CreateColumnButtons>
         <Button type="submit" variant="contained">
           Add

@@ -5,6 +5,7 @@ import type { Card } from "../../../shared/types/kanban";
 import { deleteCard } from "../api/deleteCard";
 import IconButton from "../../../shared/components/IconButton";
 import { isOverdue as checkOverdue } from "../../../shared/utils/date";
+import { useToast } from "../../../shared/hooks/useToast";
 
 interface CardDetailContentProps {
   card: Card;
@@ -13,16 +14,18 @@ interface CardDetailContentProps {
 
 export default function CardDetailContent({ card, onEdit }: CardDetailContentProps) {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const isOverdue = checkOverdue(card.due_date);
 
   const deleteMutation = useMutation({
     mutationFn: (cardId: string) => deleteCard(cardId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });
+      showToast("카드가 삭제되었습니다.", "success");
     },
     onError: (err) => {
       console.error(err);
-      alert("카드 삭제 중 오류가 발생했습니다.");
+      showToast("카드 삭제 중 오류가 발생했습니다.", "error");
     },
   });
 

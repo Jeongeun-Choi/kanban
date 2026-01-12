@@ -8,6 +8,7 @@ import Textarea from "../../../shared/components/Textarea";
 import useInput from "../../../shared/hooks/useInput";
 import type { Card, Column } from "../../../shared/types/kanban";
 import { updateCard } from "../api/patchCard";
+import { useToast } from "../../../shared/hooks/useToast";
 
 import * as Styled from "../styles/styled";
 
@@ -18,9 +19,17 @@ interface CardEditContentProps {
 }
 
 export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditContentProps) {
-  const { value: title, handleChange: handleChangeTitle } = useInput({ initialValue: card.title });
+  const { showToast } = useToast();
+
+  const { value: title, handleChange: handleChangeTitle } = useInput({
+    initialValue: card.title,
+    maxLength: 100,
+    onLimitReached: () => showToast("제목은 100자 이하로 입력해주세요.", "warning"),
+  });
   const { value: description, handleChange: handleChangeDescription } = useInput({
     initialValue: card.description,
+    maxLength: 1000,
+    onLimitReached: () => showToast("설명은 1000자 이하로 입력해주세요.", "warning"),
   });
   const { value: dueDate, handleChange: handleChangeDueDate } = useInput({
     initialValue: card.due_date ?? "",
@@ -60,6 +69,7 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
       return { previousColumns };
     },
     onSuccess: () => {
+      showToast("카드가 수정되었습니다.", "success");
       onEdit();
     },
     onError: (err, _, context) => {
@@ -67,6 +77,7 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
         queryClient.setQueryData(["columns"], context.previousColumns);
       }
       console.error(err);
+      showToast("카드 수정 중 오류가 발생했습니다.", "error");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["columns"] });
@@ -77,12 +88,7 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
     event.preventDefault();
 
     if (!title) {
-      alert("Title is required");
-      return;
-    }
-
-    if (title.length > 100) {
-      alert("Title must be 100 characters or less");
+      showToast("제목을 입력해주세요.", "warning");
       return;
     }
 
@@ -113,7 +119,14 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
     <Styled.EditForm onSubmit={handleSubmit}>
       <Styled.InputGroup>
         <Styled.EditLabel htmlFor="title">제목</Styled.EditLabel>
-        <Input type="text" id="title" value={title} onChange={handleChangeTitle} fullWidth />
+        <Input
+          type="text"
+          id="title"
+          value={title}
+          onChange={handleChangeTitle}
+          fullWidth
+          maxLength={100}
+        />
       </Styled.InputGroup>
       <Styled.InputGroup>
         <Styled.EditLabel htmlFor="description">설명</Styled.EditLabel>
@@ -122,6 +135,7 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
           value={description}
           onChange={handleChangeDescription}
           fullWidth
+          maxLength={1000}
         />
       </Styled.InputGroup>
       <Styled.InputGroup>
