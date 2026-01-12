@@ -8,6 +8,7 @@ import CreateColumnForm from "./features/column/components/CreateColumnForm";
 import { useState, Fragment } from "react";
 import { useCardDrag } from "./features/card/hooks/useCardDrag";
 import { useColumnDrag } from "./features/column/hooks/useColumnDrag";
+import BoardSkeleton from "./features/board/components/BoardSkeleton";
 
 const BoardContainer = styled.div`
   width: 100%;
@@ -21,7 +22,7 @@ const BoardContainer = styled.div`
 function App() {
   const [open, setOpen] = useState(false);
 
-  const { data: columns = [] } = useQuery({
+  const { data: columns = [], isLoading } = useQuery({
     queryKey: ["columns"],
     queryFn: () => getColumns(),
   });
@@ -53,30 +54,36 @@ function App() {
         handleColumnDragEnd();
       }}
     >
-      {columns.map((column, index) => (
-        <Fragment key={column.id}>
-          {columnDropIndicator?.index === index && <Styled.ColumnDropIndicator />}
-          <Column
-            id={column.id}
-            title={column.title}
-            cards={column.cards}
-            draggable
-            onColumnDragStart={handleColumnDragStart}
-            onColumnDragOver={handleColumnDragOver}
-            onColumnDragEnd={handleColumnDragEnd}
-            isDragging={draggedColumnId === column.id}
-            onCardDragStart={handleCardDragStart}
-            onCardDragOver={handleCardDragOver}
-            onCardDragEnd={handleCardDragEnd}
-            onColumnDrop={handleCardDrop}
-            draggedCard={draggedCard}
-            dropIndicator={cardDropIndicator}
-          />
-        </Fragment>
-      ))}
-      {columnDropIndicator?.index === columns.length && <Styled.ColumnDropIndicator />}
-      <CreateColumnForm open={open} onClose={() => setOpen(false)} />
-      <AdditionColumnButton emptyColumn={columns?.length === 0} onClick={() => setOpen(true)} />
+      {isLoading ? (
+        <BoardSkeleton />
+      ) : (
+        <>
+          {columns.map((column, index) => (
+            <Fragment key={column.id}>
+              {columnDropIndicator?.index === index && <Styled.ColumnDropIndicator />}
+              <Column
+                id={column.id}
+                title={column.title}
+                cards={column.cards}
+                draggable
+                onColumnDragStart={handleColumnDragStart}
+                onColumnDragOver={handleColumnDragOver}
+                onColumnDragEnd={handleColumnDragEnd}
+                isDragging={draggedColumnId === column.id}
+                onCardDragStart={handleCardDragStart}
+                onCardDragOver={handleCardDragOver}
+                onCardDragEnd={handleCardDragEnd}
+                onColumnDrop={handleCardDrop}
+                draggedCard={draggedCard}
+                dropIndicator={cardDropIndicator}
+              />
+            </Fragment>
+          ))}
+          {columnDropIndicator?.index === columns.length && <Styled.ColumnDropIndicator />}
+          <CreateColumnForm open={open} onClose={() => setOpen(false)} />
+          <AdditionColumnButton emptyColumn={columns?.length === 0} onClick={() => setOpen(true)} />
+        </>
+      )}
     </BoardContainer>
   );
 }
