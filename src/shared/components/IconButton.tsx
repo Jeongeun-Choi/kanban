@@ -1,9 +1,12 @@
 import styled from "@emotion/styled";
-import { type ButtonHTMLAttributes, forwardRef, type ReactNode } from "react";
+import { type ButtonHTMLAttributes, type ReactNode, type Ref } from "react";
+import Spinner from "./Spinner";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   size?: "small" | "medium" | "large";
+  loading?: boolean;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 const StyledIconButton = styled.button<IconButtonProps>`
@@ -38,14 +41,23 @@ const StyledIconButton = styled.button<IconButtonProps>`
   }
 `;
 
-const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(({ children, ...props }, ref) => {
+export default function IconButton({
+  children,
+  loading,
+  disabled,
+  size,
+  ref,
+  ...props
+}: IconButtonProps) {
+  const spinnerSize = size === "small" ? 12 : size === "large" ? 20 : 16;
+
   return (
-    <StyledIconButton ref={ref} {...props}>
-      {children}
+    <StyledIconButton ref={ref} disabled={disabled || loading} size={size} {...props}>
+      {loading ? (
+        <Spinner size={spinnerSize} color="currentColor" thickness={size === "small" ? 1.5 : 2} />
+      ) : (
+        children
+      )}
     </StyledIconButton>
   );
-});
-
-IconButton.displayName = "IconButton";
-
-export default IconButton;
+}

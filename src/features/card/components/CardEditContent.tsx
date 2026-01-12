@@ -143,7 +143,7 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
         <Input type="date" id="due_date" value={dueDate} onChange={handleChangeDueDate} fullWidth />
       </Styled.InputGroup>
       <Styled.EditButtons>
-        <Button type="submit" variant="contained" disabled={!isDirty}>
+        <Button type="submit" variant="contained" disabled={!isDirty} loading={mutation.isPending}>
           Edit
         </Button>
         <Button type="button" variant="outlined" onClick={handleCancel}>

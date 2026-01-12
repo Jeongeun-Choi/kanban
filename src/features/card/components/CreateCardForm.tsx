@@ -139,7 +139,7 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
       />
       <Input value={dueDate} type="date" fullWidth onChange={handleChangeDueDate} />
       <Styled.CreateCardButtons>
-        <Button type="submit" variant="contained">
+        <Button type="submit" variant="contained" loading={mutation.isPending}>
           Add
         </Button>
         <Button type="button" variant="outlined" onClick={onClose}>

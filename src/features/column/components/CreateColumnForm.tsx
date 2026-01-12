@@ -65,7 +65,7 @@ export default function CreateColumnForm({ open, onClose }: CreateColumnFormProp
         maxLength={50}
       />
       <Styled.CreateColumnButtons>
-        <Button type="submit" variant="contained">
+        <Button type="submit" variant="contained" loading={mutation.isPending}>
           Add
         </Button>
         <Button type="button" variant="outlined" onClick={onClose}>

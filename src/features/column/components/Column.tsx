@@ -135,12 +135,17 @@ export default memo(function Column({
                 fullWidth
                 autoFocus
                 maxLength={50}
+                disabled={updateMutation.isPending}
               />
             ) : (
               <Styled.ColumnTitle onClick={() => setIsEditing(true)}>{title}</Styled.ColumnTitle>
             )}
           </Styled.TitleForm>
-          <IconButton size="small" onClick={() => setIsEditing(true)}>
+          <IconButton
+            size="small"
+            onClick={() => setIsEditing(true)}
+            loading={updateMutation.isPending}
+          >
             <FaRegEdit />
           </IconButton>
           <IconButton size="small" onClick={() => setModalOpen(true)}>
