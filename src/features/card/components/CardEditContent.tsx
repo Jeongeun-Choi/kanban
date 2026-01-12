@@ -46,13 +46,12 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
     initialValue: card.due_date ?? "",
   });
   const queryClient = useQueryClient();
+  const previousColumns = queryClient.getQueryData<Column[]>(["columns"]);
 
   const mutation = useMutation({
     mutationFn: (newCard: Partial<Card>) => updateCard(card.id, newCard),
     onMutate: async (newCard: Partial<Card>) => {
       await queryClient.cancelQueries({ queryKey: ["columns"] });
-
-      const previousColumns = queryClient.getQueryData<Column[]>(["columns"]);
 
       queryClient.setQueryData<Column[]>(["columns"], (old) => {
         if (!old) return [];
@@ -95,6 +94,11 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
     },
   });
 
+  const isTitleDirty = title !== card.title;
+  const isDescriptionDirty = (description || "") !== (card.description || "");
+  const isDueDateDirty = (dueDate || "") !== (card.due_date || "");
+  const isDirty = isTitleDirty || isDescriptionDirty || isDueDateDirty;
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -111,15 +115,6 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
     mutation.mutate({ title, description, due_date: cleanDueDate });
   };
 
-  const isTitleDirty = title !== card.title;
-  const isDescriptionDirty = (description || "") !== (card.description || "");
-  const isDueDateDirty = (dueDate || "") !== (card.due_date || "");
-  const isDirty = isTitleDirty || isDescriptionDirty || isDueDateDirty;
-
-  useEffect(() => {
-    setIsDirty(isDirty);
-  }, [isDirty, setIsDirty]);
-
   const handleCancel = () => {
     if (isDirty) {
       const isCancel = confirm("변경사항이 있습니다. 정말로 취소하시겠습니까?");
@@ -127,6 +122,10 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
     }
     onEdit();
   };
+
+  useEffect(() => {
+    setIsDirty(isDirty);
+  }, [isDirty, setIsDirty]);
 
   return (
     <Styled.EditForm onSubmit={handleSubmit}>

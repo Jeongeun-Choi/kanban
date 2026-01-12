@@ -1,6 +1,8 @@
 import styled from "@emotion/styled";
 import { type ButtonHTMLAttributes, type Ref } from "react";
-import Spinner from "./Spinner";
+import Spinner from "../Loading/Spinner";
+
+export { default as IconButton } from "./IconButton";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "contained" | "outlined" | "text";

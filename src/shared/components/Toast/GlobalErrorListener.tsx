@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../hooks/useToast";
 import { isNetworkError } from "../../utils/network";
+import { BUTTON_LABELS, ERROR_MESSAGES } from "../../constants/index";
 
 export default function GlobalErrorListener() {
   const queryClient = useQueryClient();
@@ -18,9 +19,9 @@ export default function GlobalErrorListener() {
         const hasBeenRetried = manualRetryKeys.current.has(queryKeyString);
 
         if (netError && !hasBeenRetried) {
-          showToast("네트워크 연결이 불안정합니다. 연결 상태를 확인해 주세요.", "error", {
+          showToast(ERROR_MESSAGES.NETWORK_UNSTABLE, "error", {
             action: {
-              label: "다시 요청",
+              label: BUTTON_LABELS.RETRY,
               onClick: () => {
                 manualRetryKeys.current.add(queryKeyString);
                 queryClient.refetchQueries({ queryKey: event.query.queryKey });
@@ -29,10 +30,10 @@ export default function GlobalErrorListener() {
             duration: 0,
           });
         } else if (netError && hasBeenRetried) {
-          showToast("네트워크 연결에 다시 실패했습니다.", "error");
+          showToast(ERROR_MESSAGES.NETWORK_RETRY_FAILED, "error");
           manualRetryKeys.current.delete(queryKeyString);
         } else {
-          showToast((error as Error).message || "오류가 발생했습니다.", "error");
+          showToast((error as Error).message || ERROR_MESSAGES.DEFAULT_ERROR, "error");
         }
       }
 
@@ -45,9 +46,9 @@ export default function GlobalErrorListener() {
       if (event.type === "updated" && event.action.type === "error") {
         const error = event.action.error;
         if (isNetworkError(error)) {
-          showToast("네트워크 연결이 오프라인 상태입니다.", "error");
+          showToast(ERROR_MESSAGES.OFFLINE, "error");
         } else {
-          showToast((error as Error).message || "요청 처리 중 오류가 발생했습니다.", "error");
+          showToast((error as Error).message || ERROR_MESSAGES.MUTATION_ERROR, "error");
         }
       }
     });

@@ -1,6 +1,6 @@
 import { useState, Fragment, memo, type DragEvent, useRef, useEffect } from "react";
 import * as Styled from "../styles/styled";
-import AdditionCardButton from "./AdditionCardButton";
+import AdditionCardButton from "../../card/components/AdditionCardButton";
 import Card from "../../card/components/Card";
 import type { Card as CardType } from "../../../shared/types/kanban";
 import CreateCardForm from "../../card/components/CreateCardForm";

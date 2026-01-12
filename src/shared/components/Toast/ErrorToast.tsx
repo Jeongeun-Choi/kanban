@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { FaExclamationTriangle } from "react-icons/fa";
 import BaseToast from "./BaseToast";
+import { ERROR_MESSAGES } from "../../constants/index";
 
 interface ErrorToastProps {
   message: string;
@@ -106,7 +107,7 @@ export default function ErrorToast({ message, action, duration = 0, onClose }: E
           <FaExclamationTriangle />
         </IconWrapper>
         <MessageWrapper>
-          <Title>오류 발생</Title>
+          <Title>{ERROR_MESSAGES.TITLE}</Title>
           <Description>{message}</Description>
         </MessageWrapper>
         <CloseButton onClick={onClose}>&times;</CloseButton>

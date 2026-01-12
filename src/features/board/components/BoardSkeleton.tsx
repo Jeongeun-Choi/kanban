@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
-import Skeleton from "../../../shared/components/Skeleton";
+import Skeleton from "../../../shared/components/Loading/Skeleton";
 import * as Styled from "../../column/styles/styled";
+import { SKELETON_COUNTS } from "../../../shared/constants/index";
 
 const SkeletonColumn = styled(Styled.ColumnContainer)`
   pointer-events: none;
@@ -18,13 +19,13 @@ const SkeletonCard = styled.div`
 export default function BoardSkeleton() {
   return (
     <>
-      {[1, 2, 3].map((i) => (
+      {Array.from({ length: SKELETON_COUNTS.COLUMNS }).map((_, i) => (
         <SkeletonColumn key={i}>
           <Styled.ColumnHeader>
             <Skeleton width="120px" height="24px" />
           </Styled.ColumnHeader>
           <Styled.ColumnContent>
-            {[1, 2, 3, 4].map((j) => (
+            {Array.from({ length: SKELETON_COUNTS.CARDS }).map((_, j) => (
               <SkeletonCard key={j}>
                 <Skeleton width="80%" height="18px" />
                 <div style={{ marginTop: "10px" }}>

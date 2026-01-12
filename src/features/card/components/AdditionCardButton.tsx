@@ -1,5 +1,5 @@
 import { FaPlus } from "react-icons/fa";
-import { AdditionCardButtonContainer } from "../styles/styled";
+import { AdditionCardButtonContainer } from "../../column/styles/styled";
 import Button from "../../../shared/components/Button";
 
 interface AdditionCardButtonProps {
