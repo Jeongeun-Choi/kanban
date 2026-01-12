@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, memo, type FormEvent, type DragEvent } from "react";
+import { useEffect, useState, memo, type FormEvent, type DragEvent } from "react";
 
 import * as Styled from "../styles/styled";
 import type { Card as CardType } from "../../../shared/types/kanban";
@@ -11,6 +11,7 @@ import DeleteColumnModal from "./DeleteColumnModal";
 import Input from "../../../shared/components/Input";
 import IconButton from "../../../shared/components/IconButton";
 import { useToast } from "../../../shared/hooks/useToast";
+import useInput from "../../../shared/hooks/useInput";
 
 interface ColumnProps {
   id: string;
@@ -51,9 +52,24 @@ export default memo(function Column({
 }: ColumnProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const titleRef = useRef<HTMLInputElement>(null);
+
+  const {
+    value: editTitle,
+    handleChange: handleInputChange,
+    setValue: setEditTitle,
+  } = useInput({ initialValue: title });
+
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+
+  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length >= 50) {
+      showToast("컬럼 제목은 50자 이하로 입력해주세요.", "warning");
+      return;
+    }
+    handleInputChange(e);
+  };
 
   const updateMutation = useMutation({
     mutationFn: (newTitle: string) => updateColumn(id, { title: newTitle }),
@@ -70,26 +86,29 @@ export default memo(function Column({
 
   const handleSubmitTitle = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (titleRef.current?.value && titleRef.current.value !== title) {
-      updateMutation.mutate(titleRef.current.value.trim());
+    if (editTitle?.trim() && editTitle.trim() !== title) {
+      updateMutation.mutate(editTitle.trim());
     } else {
       setIsEditing(false);
+      setEditTitle(title);
     }
   };
 
   const handleBlur = () => {
-    if (titleRef.current?.value && titleRef.current.value !== title) {
-      updateMutation.mutate(titleRef.current.value.trim());
+    if (editTitle?.trim() && editTitle.trim() !== title) {
+      updateMutation.mutate(editTitle.trim());
     } else {
       setIsEditing(false);
+      setEditTitle(title);
     }
   };
 
+  // Sync edit title if underlying title changes
   useEffect(() => {
-    if (isEditing) {
-      titleRef.current?.focus();
+    if (!isEditing) {
+      setEditTitle(title);
     }
-  }, [isEditing]);
+  }, [title, isEditing, setEditTitle]);
 
   return (
     <>
@@ -114,7 +133,14 @@ export default memo(function Column({
         <Styled.ColumnHeader>
           <Styled.TitleForm onSubmit={handleSubmitTitle}>
             {isEditing ? (
-              <Input ref={titleRef} defaultValue={title} onBlur={handleBlur} fullWidth />
+              <Input
+                value={editTitle}
+                onChange={handleChangeTitle}
+                onBlur={handleBlur}
+                fullWidth
+                autoFocus
+                maxLength={50}
+              />
             ) : (
               <Styled.ColumnTitle onClick={() => setIsEditing(true)}>{title}</Styled.ColumnTitle>
             )}

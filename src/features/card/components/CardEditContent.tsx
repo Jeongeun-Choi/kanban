@@ -19,8 +19,8 @@ interface CardEditContentProps {
 }
 
 export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditContentProps) {
-  const { value: title, handleChange: handleChangeTitle } = useInput({ initialValue: card.title });
-  const { value: description, handleChange: handleChangeDescription } = useInput({
+  const { value: title, setValue: setTitle } = useInput({ initialValue: card.title });
+  const { value: description, setValue: setDescription } = useInput({
     initialValue: card.description,
   });
   const { value: dueDate, handleChange: handleChangeDueDate } = useInput({
@@ -28,6 +28,22 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
   });
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+
+  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length >= 100) {
+      showToast("제목은 100자 이하로 입력해주세요.", "warning");
+    }
+    setTitle(newValue);
+  };
+
+  const handleChangeDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length >= 1000) {
+      showToast("설명은 1000자 이하로 입력해주세요.", "warning");
+    }
+    setDescription(newValue);
+  };
 
   const mutation = useMutation({
     mutationFn: (newCard: Partial<Card>) => updateCard(card.id, newCard),
@@ -85,11 +101,6 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
       return;
     }
 
-    if (title.length > 100) {
-      showToast("제목은 100자 이하로 입력해주세요.", "warning");
-      return;
-    }
-
     // 빈 문자열이면 undefined로 전송 (API 스펙에 맞춤)
     const cleanDueDate = dueDate === "" ? undefined : dueDate;
 
@@ -117,7 +128,14 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
     <Styled.EditForm onSubmit={handleSubmit}>
       <Styled.InputGroup>
         <Styled.EditLabel htmlFor="title">제목</Styled.EditLabel>
-        <Input type="text" id="title" value={title} onChange={handleChangeTitle} fullWidth />
+        <Input
+          type="text"
+          id="title"
+          value={title}
+          onChange={handleChangeTitle}
+          fullWidth
+          maxLength={100}
+        />
       </Styled.InputGroup>
       <Styled.InputGroup>
         <Styled.EditLabel htmlFor="description">설명</Styled.EditLabel>
@@ -126,6 +144,7 @@ export default function CardEditContent({ card, onEdit, setIsDirty }: CardEditCo
           value={description}
           onChange={handleChangeDescription}
           fullWidth
+          maxLength={1000}
         />
       </Styled.InputGroup>
       <Styled.InputGroup>

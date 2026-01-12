@@ -17,18 +17,10 @@ interface CreateCardFormProps {
 }
 
 export default function CreateCardForm({ open, columnId, onClose }: CreateCardFormProps) {
-  const {
-    value: title,
-    handleChange: handleChangeTitle,
-    setValue: setTitle,
-  } = useInput({
+  const { value: title, setValue: setTitle } = useInput({
     initialValue: "",
   });
-  const {
-    value: description,
-    handleChange: handleChangeDescription,
-    setValue: setDescription,
-  } = useInput({
+  const { value: description, setValue: setDescription } = useInput({
     initialValue: "",
   });
   const {
@@ -41,6 +33,24 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
 
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+
+  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length >= 100) {
+      showToast("제목은 100자 이하로 입력해주세요.", "warning");
+      return;
+    }
+    setTitle(newValue);
+  };
+
+  const handleChangeDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length >= 1000) {
+      showToast("설명은 1000자 이하로 입력해주세요.", "warning");
+      return;
+    }
+    setDescription(newValue);
+  };
 
   const mutation = useMutation({
     mutationFn: createCard,
@@ -101,11 +111,6 @@ export default function CreateCardForm({ open, columnId, onClose }: CreateCardFo
 
     if (!title) {
       showToast("제목을 입력해주세요.", "warning");
-      return;
-    }
-
-    if (title.length > 100) {
-      showToast("제목은 100자 이하로 입력해주세요.", "warning");
       return;
     }
 
