@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
-import { type TextareaHTMLAttributes, forwardRef } from "react";
+import { type TextareaHTMLAttributes, type Ref } from "react";
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   fullWidth?: boolean;
+  ref?: Ref<HTMLTextAreaElement>;
 }
 
 const StyledTextarea = styled.textarea<TextareaProps>`
@@ -29,10 +30,6 @@ const StyledTextarea = styled.textarea<TextareaProps>`
   }
 `;
 
-const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>((props, ref) => {
+export default function Textarea({ ref, ...props }: TextareaProps) {
   return <StyledTextarea ref={ref} {...props} />;
-});
-
-Textarea.displayName = "Textarea";
-
-export default Textarea;
+}

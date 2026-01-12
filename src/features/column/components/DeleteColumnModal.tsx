@@ -35,6 +35,7 @@ export default function DeleteColumnModal({ open, onClose, columnId }: DeleteCol
       buttons={[
         <Button
           variant="contained"
+          loading={deleteMutation.isPending}
           onClick={() => {
             deleteMutation.mutate();
           }}

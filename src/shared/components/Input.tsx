@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
-import { type InputHTMLAttributes, forwardRef } from "react";
+import { type InputHTMLAttributes, type Ref } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   fullWidth?: boolean;
+  ref?: Ref<HTMLInputElement>;
 }
 
 const StyledInput = styled.input<InputProps>`
@@ -26,10 +27,6 @@ const StyledInput = styled.input<InputProps>`
   }
 `;
 
-const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+export default function Input({ ref, ...props }: InputProps) {
   return <StyledInput ref={ref} {...props} />;
-});
-
-Input.displayName = "Input";
-
-export default Input;
+}

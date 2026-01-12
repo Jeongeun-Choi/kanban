@@ -1,9 +1,12 @@
 import styled from "@emotion/styled";
-import { type ButtonHTMLAttributes, forwardRef } from "react";
+import { type ButtonHTMLAttributes, type Ref } from "react";
+import Spinner from "./Spinner";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "contained" | "outlined" | "text";
   fullWidth?: boolean;
+  loading?: boolean;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 const StyledButton = styled.button<ButtonProps>`
@@ -17,6 +20,8 @@ const StyledButton = styled.button<ButtonProps>`
   transition: all 0.2s;
   cursor: pointer;
   width: ${({ fullWidth }) => (fullWidth ? "100%" : "fit-content")};
+  gap: 0.5rem;
+  min-height: 34px;
 
   ${({ variant = "contained" }) => {
     switch (variant) {
@@ -56,10 +61,11 @@ const StyledButton = styled.button<ButtonProps>`
   }
 `;
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-  return <StyledButton ref={ref} {...props} />;
-});
-
-Button.displayName = "Button";
-
-export default Button;
+export default function Button({ children, loading, disabled, ref, ...props }: ButtonProps) {
+  return (
+    <StyledButton ref={ref} disabled={disabled || loading} {...props}>
+      {loading && <Spinner size={14} color="currentColor" thickness={2} />}
+      {children}
+    </StyledButton>
+  );
+}
